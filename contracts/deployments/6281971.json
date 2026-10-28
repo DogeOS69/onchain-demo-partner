@@ -1,0 +1,9 @@
+{
+  "chainId": 6281971,
+  "network": "dogeos",
+  "rpcUrl": "https://rpc.testnet.dogeos.com/",
+  "deployer": "0x707e55a12557E89915D121932F83dEeEf09E5d70",
+  "contracts": {
+    "EventEmitter": "0xB5F4756Ef5BE714Bd35fCf976da52F1F7aD11f66"
+  }
+}

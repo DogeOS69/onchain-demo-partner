@@ -1,0 +1,17 @@
+# Secrets — never ship these
+.env
+.env*.local
+
+# Node / Next
+**/node_modules/
+web/.next/
+web/out/
+
+# Foundry build artifacts (regenerate with `forge build`)
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/lib/
+
+# Misc
+.DS_Store
