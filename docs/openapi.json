@@ -1,0 +1,255 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DogeOS Partner Eligibility API",
+    "version": "1.0.0",
+    "description": "Partner-server endpoint for External Rule quests. Marks eligibility; the player still verifies in Questing. Smart Contract Event quests do not use this endpoint. Reviewed against Quest API staging source 6d1cbbd884d22c83746162fb0bb1a4a194f8e783 on 2026-10-29. See api-reference.md for the full behavior and going-live.md before switching to production."
+  },
+  "servers": [
+    {
+      "url": "https://quest-api-staging.dogeos.com",
+      "description": "Staging; use staging keys and quest IDs"
+    },
+    {
+      "url": "https://quest-api.dogeos.com",
+      "description": "Production; confirm production setup with DogeOS before use"
+    }
+  ],
+  "security": [
+    {
+      "PartnerApiKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "External Rule",
+      "description": "Signal eligibility from the partner backend."
+    }
+  ],
+  "paths": {
+    "/v2/partner-api/quests/{questId}/mark-eligible": {
+      "post": {
+        "operationId": "markExternalQuestEligible",
+        "tags": [
+          "External Rule"
+        ],
+        "summary": "Mark a wallet eligible to verify an External Rule quest",
+        "description": "The key and quest must belong to the same partner in the same environment. Repeated signals upsert the same quest-wallet record, refresh its timestamp, and replace metadata. The general eligibility record has no expiry check and is not consumed by verification; coordinate recurring-action requirements with DogeOS. Keep API keys server-side.",
+        "parameters": [
+          {
+            "name": "questId",
+            "in": "path",
+            "required": true,
+            "description": "UUID of an existing, non-deleted external_rule quest owned by your partner.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "013f60a4-3a6e-4bb1-888b-435a845534a8"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkEligibleRequest"
+              },
+              "example": {
+                "walletAddress": "0x22a4839d6d0342283d42a0e973e3183fc14e4637",
+                "metadata": {
+                  "score": 100,
+                  "internalUserId": "user_abc123"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Eligibility recorded. This does not confirm quest completion or reward delivery.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarkEligibleResponse"
+                },
+                "example": {
+                  "data": {
+                    "marked": true,
+                    "questId": "013f60a4-3a6e-4bb1-888b-435a845534a8",
+                    "walletAddress": "0x22a4839d6d0342283d42a0e973e3183fc14e4637"
+                  },
+                  "status": 200
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request parsing failed, for example an invalid quest UUID or malformed JSON. May be plain text.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported or missing application/json content type. May be plain text.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Handler validation failure, including missing/revoked API key, invalid wallet, missing quest, partner mismatch, unsupported quest type, or reserved native-app evidence. A request-body type error may instead return plain text.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                },
+                "example": {
+                  "message": "Validation error: Missing X-Partner-API-Key header",
+                  "status": 422,
+                  "code": null,
+                  "retryable": null,
+                  "recommendedAction": null,
+                  "source": null
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Other infrastructure or server failure. Check status and content type; do not assume a JSON error envelope."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "PartnerApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Partner-API-Key",
+        "description": "Raw partner key generated in the matching environment. Never expose it to the browser."
+      }
+    },
+    "schemas": {
+      "MarkEligibleRequest": {
+        "type": "object",
+        "required": [
+          "walletAddress"
+        ],
+        "properties": {
+          "walletAddress": {
+            "type": "string",
+            "description": "EVM address with lowercase 0x prefix and 40 hex characters. Surrounding whitespace is accepted and trimmed; the address is stored lowercase.",
+            "pattern": "^\\s*0x[0-9a-fA-F]{40}\\s*$",
+            "examples": [
+              "0x22a4839d6d0342283d42a0e973e3183fc14e4637"
+            ]
+          },
+          "metadata": {
+            "description": "Optional audit context; use an object. The current backend accepts any JSON value. Omitted or null becomes an empty object; repeated signals replace existing metadata. The nativeAppEvidence field is reserved for the separately configured MyDoge integration.",
+            "examples": [
+              {
+                "score": 100,
+                "internalUserId": "user_abc123"
+              }
+            ]
+          }
+        }
+      },
+      "MarkEligibleResponse": {
+        "type": "object",
+        "required": [
+          "data",
+          "status"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "marked",
+              "questId",
+              "walletAddress"
+            ],
+            "properties": {
+              "marked": {
+                "type": "boolean",
+                "const": true
+              },
+              "questId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "walletAddress": {
+                "type": "string",
+                "pattern": "^0x[0-9a-f]{40}$",
+                "description": "Normalized lowercase EVM address."
+              }
+            }
+          },
+          "status": {
+            "type": "integer",
+            "const": 200
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": [
+          "message",
+          "status",
+          "code",
+          "retryable",
+          "recommendedAction",
+          "source"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Handler error prefixed with Validation error: . See api-reference.md for messages."
+          },
+          "status": {
+            "type": "integer",
+            "const": 422
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "retryable": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "recommendedAction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
