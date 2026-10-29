@@ -14,15 +14,23 @@ import { NextRequest, NextResponse } from "next/server";
  * DogeOS.
  */
 export async function POST(request: NextRequest) {
-  const apiUrl = process.env.DOGEOS_API_URL;
-  const apiKey = process.env.DOGEOS_PARTNER_API_KEY;
-  const questId = process.env.DOGEOS_EXTERNAL_QUEST_ID;
+  const env = process.env.DOGEOS_ENV || "staging";
+  if (env !== "staging" && env !== "prod") {
+    return NextResponse.json(
+      { error: "DOGEOS_ENV must be staging or prod." },
+      { status: 500 },
+    );
+  }
+
+  const prefix = env === "prod" ? "DOGEOS_PROD" : "DOGEOS_STAGING";
+  const apiUrl = process.env[`${prefix}_API_URL`];
+  const apiKey = process.env[`${prefix}_PARTNER_API_KEY`];
+  const questId = process.env[`${prefix}_EXTERNAL_QUEST_ID`];
 
   if (!apiUrl || !apiKey || !questId) {
     return NextResponse.json(
       {
-        error:
-          "Demo partner backend isn't configured. Set DOGEOS_API_URL, DOGEOS_PARTNER_API_KEY, and DOGEOS_EXTERNAL_QUEST_ID in onchain-demo/web/.env.local.",
+        error: `Demo partner backend isn't configured for ${env}. Set ${prefix}_API_URL, ${prefix}_PARTNER_API_KEY, and ${prefix}_EXTERNAL_QUEST_ID in web/.env.local.`,
       },
       { status: 500 },
     );
