@@ -99,9 +99,15 @@ Edit `web/.env.local`:
 | `NEXT_PUBLIC_EVENT_EMITTER_ADDRESS` | Onchain event card | Your deployed contract address. |
 | `NEXT_PUBLIC_DOGEOS_CLIENT_ID` | SDK wallet integration | Registered client ID from the [developer console](https://console.dogeos.com/). Use the Sandbox ID for development and configure the application origin. |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | WalletConnect | Your project ID, if using that connection method. |
-| `DOGEOS_API_URL` | External Rule backend | `https://quest-api-staging.dogeos.com`. |
-| `DOGEOS_PARTNER_API_KEY` | External Rule backend | Staging key created in the CMS. |
-| `DOGEOS_EXTERNAL_QUEST_ID` | External Rule backend | UUID of your staging External Rule quest. |
+| `DOGEOS_ENV` | External Rule environment selector | `staging` for testing or `prod` for production. Unset or empty defaults to `staging`. |
+| `DOGEOS_STAGING_API_URL` | Staging External Rule backend | `https://quest-api-staging.dogeos.com`. |
+| `DOGEOS_STAGING_PARTNER_API_KEY` | Staging External Rule backend | Staging key created in the CMS. |
+| `DOGEOS_STAGING_EXTERNAL_QUEST_ID` | Staging External Rule backend | UUID of your staging External Rule quest. |
+| `DOGEOS_PROD_API_URL` | Production External Rule backend | `https://quest-api.dogeos.com`. |
+| `DOGEOS_PROD_PARTNER_API_KEY` | Production External Rule backend | Partner key generated in production. |
+| `DOGEOS_PROD_EXTERNAL_QUEST_ID` | Production External Rule backend | Production quest UUID confirmed with DogeOS. |
+
+For External Rule, configure the API URL, key, and quest UUID for the selected environment. The demo reads only that environment's three variables; it does not borrow missing values from the other environment. `DOGEOS_ENV` selects the Questing API configuration, independently of the browser's blockchain network and SDK client ID.
 
 Create the quest using the relevant section below. The [environment template](web/.env.example) contains the remaining public chain settings. The [current SDK guide](https://docs.dogeos.com/en/sdk) requires a registered client ID; do not rely on older beta behavior with an empty ID. `NEXT_PUBLIC_` values are exposed to the browser; never use that prefix for a partner key. Restart Next.js after changing environment values.
 
@@ -174,21 +180,25 @@ Use this quest type when your backend verifies an action on your platform. Eligi
 
 In the staging CMS, open **API Keys → Generate new key**. The raw key is shown once. Save it in your backend's secret store and send it as `X-Partner-API-Key`. If you lose it, revoke it and generate another. The key and quest must belong to the same partner and environment.
 
+![API key creation dialog with the entire key covered by an opaque black rectangle](docs/assets/api-key-created.png)
+
 ### 2. Create the quest
 
 Open **Quests → New Quest → Other → External Rule** (`external_rule`). Configure the action description, destination URL, rewards, frequency, and availability. Save, then copy the quest UUID from the wiring dialog or quest list.
 
 ### 3. Signal eligibility from your backend
 
-Authenticate the user, associate the correct EVM wallet with their account, and validate the action before calling DogeOS. The example wallet and quest UUID below are placeholders; replace both with your staging values. Load `DOGEOS_PARTNER_API_KEY` from your backend's secret store.
+Authenticate the user, associate the correct EVM wallet with their account, and validate the action before calling DogeOS. The example wallet and quest UUID below are placeholders; replace both with your staging values. Load `DOGEOS_STAGING_PARTNER_API_KEY` from your backend's secret store.
+
+This direct API example calls staging explicitly. The demo's local route uses `DOGEOS_ENV` to choose its configuration.
 
 ```bash
-export DOGEOS_API_URL='https://quest-api-staging.dogeos.com'
-export DOGEOS_EXTERNAL_QUEST_ID='11111111-1111-4111-8111-111111111111'
+export DOGEOS_STAGING_API_URL='https://quest-api-staging.dogeos.com'
+export DOGEOS_STAGING_EXTERNAL_QUEST_ID='11111111-1111-4111-8111-111111111111'
 
 curl --fail-with-body --request POST \
-  "${DOGEOS_API_URL}/v2/partner-api/quests/${DOGEOS_EXTERNAL_QUEST_ID}/mark-eligible" \
-  --header "X-Partner-API-Key: ${DOGEOS_PARTNER_API_KEY:?Load your staging key first}" \
+  "${DOGEOS_STAGING_API_URL}/v2/partner-api/quests/${DOGEOS_STAGING_EXTERNAL_QUEST_ID}/mark-eligible" \
+  --header "X-Partner-API-Key: ${DOGEOS_STAGING_PARTNER_API_KEY:?Load your staging key first}" \
   --header 'Content-Type: application/json' \
   --data '{"walletAddress":"0x1111111111111111111111111111111111111111","metadata":{"actionId":"example-action-123"}}'
 ```
@@ -289,7 +299,7 @@ After the complete flow works in staging, contact your DogeOS representative wit
 | Onchain tracking | Network, contract address, ABI, event, and wallet mapping confirmed with DogeOS. |
 
 1. Confirm production ownership, rewards, claim mode, frequency, availability dates, and publication status. Staging quests and eligibility are not automatically copied.
-2. For External Rule, change the API URL, quest UUID, and key together. Keep the key server-side and validate the user and action before signaling.
+2. For the demo's External Rule backend, set `DOGEOS_ENV=prod` and configure `DOGEOS_PROD_API_URL`, `DOGEOS_PROD_PARTNER_API_KEY`, and `DOGEOS_PROD_EXTERNAL_QUEST_ID` together. Restart or redeploy the server with those settings. Keep the key server-side and validate the user and action before signaling. In your own backend, use the matching production URL, key, and quest UUID.
 3. For Smart Contract Event, activate tracking before the test action. Confirm the production network rather than reusing testnet settings by assumption.
 4. Update and test the demo's outdated dependencies before hosting it. Review the [SDK documentation](https://docs.dogeos.com/en/sdk) for supported integration behavior and confirm the client ID and application origin.
 5. Run an agreed production test: perform the action, Verify if required, then confirm completion and reward in Questing.
@@ -304,7 +314,8 @@ After the complete flow works in staging, contact your DogeOS representative wit
 | Event picker is empty | Select a registered contract whose ABI contains the event. |
 | Event name is ambiguous | Use an unambiguous event name; overloaded names are not supported by the current integration. |
 | Transaction succeeded but the quest did not complete | Check the contract/event, wallet mapping, active quest window, and that tracking existed before the event. |
-| “Demo partner backend isn't configured” | Set all three private `DOGEOS_*` variables and restart Next.js. |
+| “DOGEOS_ENV must be staging or prod.” | Use exactly `staging` or `prod`. Other values, including `production`, return a local configuration error with HTTP `500`. |
+| “Demo partner backend isn't configured for …” | Set the API URL, partner key, and quest UUID under the selected `DOGEOS_STAGING_*` or `DOGEOS_PROD_*` prefix, then restart Next.js. Missing settings return HTTP `500` from the demo's local route. |
 | “DogeOS rejected the mark-eligible call” | Inspect the local route's `upstreamStatus` and `upstreamBody`, then check the API errors above. |
 | Quest remains pending | Send your DogeOS contact the quest ID, EVM wallet, timestamp, and transaction hash or internal action ID. Do not send keys. |
 
