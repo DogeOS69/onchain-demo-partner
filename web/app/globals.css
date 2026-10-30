@@ -1,14 +1,15 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; background: #0a0a0a; color: #e7e7e7; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.partner-demo { max-width: 720px; min-height: 100dvh; margin: 0 auto; padding: 48px 24px; color: #e7e7e7; }
+.partner-demo-shell { min-height: 100dvh; background: #0a0a0a; }
+.partner-demo { --demo-accent: #fcd436; --demo-accent-hover: #fde070; max-width: 720px; min-height: 100dvh; margin: 0 auto; padding: 48px 24px; color: #e7e7e7; }
 .partner-demo h1 { font-size: 28px; margin-bottom: 4px; }
 .partner-demo h2 { font-size: 18px; margin: 24px 0 8px; color: #c9c9c9; }
 .partner-demo .subtitle { color: #888; margin: 0 0 32px; }
 .partner-demo .card { background: #141414; border: 1px solid #262626; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
 .partner-demo .card h3 { margin: 0 0 8px; font-size: 16px; }
 .partner-demo .card .desc { color: #8a8a8a; font-size: 13px; margin: 0 0 12px; line-height: 1.5; }
-.partner-demo button { background: #ff8c00; color: #0a0a0a; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer; font-size: 14px; }
-.partner-demo button:hover:not(:disabled) { background: #ffa83d; }
+.partner-demo button { background: var(--demo-accent); color: #0a0a0a; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer; font-size: 14px; }
+.partner-demo button:hover:not(:disabled) { background: var(--demo-accent-hover); }
 .partner-demo button:disabled { background: #333; color: #777; cursor: not-allowed; }
 .partner-demo button.secondary { background: #262626; color: #e7e7e7; }
 .partner-demo button.secondary:hover:not(:disabled) { background: #333; }
@@ -21,6 +22,6 @@ html, body { margin: 0; padding: 0; background: #0a0a0a; color: #e7e7e7; font-fa
 .partner-demo .addr-row { display: flex; align-items: center; gap: 8px; }
 .partner-demo .connect-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #141414; border: 1px solid #262626; border-radius: 12px; margin-bottom: 32px; }
 .partner-demo .wallet-info { font-family: ui-monospace, monospace; font-size: 13px; }
-.partner-demo .balance { color: #ff8c00; font-weight: 600; }
-.partner-demo .note { font-size: 12px; color: #888; padding: 12px; background: #1a1a1a; border-left: 3px solid #ff8c00; border-radius: 4px; margin-bottom: 24px; }
-.partner-demo a { color: #ff8c00; }
+.partner-demo .balance { color: var(--demo-accent); font-weight: 600; }
+.partner-demo .note { font-size: 12px; color: #888; padding: 12px; background: #1a1a1a; border-left: 3px solid var(--demo-accent); border-radius: 4px; margin-bottom: 24px; }
+.partner-demo a { color: var(--demo-accent); }
