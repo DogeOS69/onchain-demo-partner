@@ -94,6 +94,8 @@ npm ci
 
 This installs the pinned SDK and its required peer dependencies from the lockfile. Do not use `--legacy-peer-deps`: omitting those peers can leave the SDK unable to build.
 
+The wallet popup uses the SDK's default light theme and DogeOS yellow (`#FCD436`), matching the Questing login popup. The demo's buttons, links, and balance use the same accent. To customize the popup, use the SDK's [theme configuration](https://docs.dogeos.com/en/sdk/configuration#theme) in [`web/app/providers.tsx`](web/app/providers.tsx); keep app styles scoped to `.partner-demo` so they do not override the SDK's controls.
+
 Edit `web/.env.local`:
 
 | Variable | Used for | Value |

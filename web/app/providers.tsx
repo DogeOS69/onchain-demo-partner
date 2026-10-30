@@ -27,12 +27,7 @@ const wagmiConfig = createConfig({
 const dogeConfig: WalletConnectKitConfig = {
   clientId: process.env.NEXT_PUBLIC_DOGEOS_CLIENT_ID ?? "",
   walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
-  theme: {
-    defaultTheme: "dark",
-    themes: {
-      dark: { colors: { background: "#0a0a0a" } },
-    },
-  },
+  // Keep the SDK's default light modal and DogeOS yellow, as used in Questing.
   chains: {
     evm: [
       {
