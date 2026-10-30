@@ -215,7 +215,7 @@ function ExternalQuestCard() {
 
 export default function Page() {
   return (
-    <main>
+    <main className="partner-demo">
       <h1>DogeOS Onchain Quest Demo</h1>
       <p className="subtitle">
         Each card drives one quest on {dogeosChain.name}. Complete the action

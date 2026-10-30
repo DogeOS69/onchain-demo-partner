@@ -2,7 +2,7 @@
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo status:** this repository is a local/staging example. Its web app still pins `@dogeos/dogeos-sdk@3.3.0-beta.0` and `next@15.5.6`. Update and test supported dependencies before hosting it for users; the pinned Next.js version is affected by a [published security advisory](https://nextjs.org/blog/CVE-2025-66478). The example eligibility route also needs real user authentication and action validation before use with real rewards.
+**Demo status:** this repository is a local/staging example. Its web app pins `@dogeos/dogeos-sdk@4.0.5`, the latest stable SDK release checked on October 29, 2026. It still pins `next@15.5.6`, which is affected by a [published security advisory](https://nextjs.org/blog/CVE-2025-66478); update and test supported dependencies before hosting it for users. The example eligibility route also needs real user authentication and action validation before use with real rewards.
 
 ## Contents
 
@@ -35,6 +35,8 @@ A partner API key is needed only for External Rule. Smart Contract Event does no
 | Partner API base URL | `https://quest-api-staging.dogeos.com` |
 
 Get partner access from your DogeOS contact. Use the same EVM wallet for the action and the Questing account. Staging has separate quest IDs, keys, configuration, and eligibility data; they do not automatically carry over to production.
+
+New Questing accounts in staging require a MyDoge Social wallet. Complete Questing onboarding before testing. Connecting another EVM wallet to this demo does not create a Questing account.
 
 Configure the Questing environment, blockchain network, and SDK project settings explicitly. Selecting a testnet does not automatically switch the other services to staging.
 
@@ -87,10 +89,10 @@ From the repository root:
 ```bash
 cd web
 cp .env.example .env.local
-npm ci --legacy-peer-deps
+npm ci
 ```
 
-The flag is needed by this demo's existing dependency lockfile. It reproduces the pinned versions; it does not update the SDK or fix outdated dependencies.
+This installs the pinned SDK and its required peer dependencies from the lockfile. Do not use `--legacy-peer-deps`: omitting those peers can leave the SDK unable to build.
 
 Edit `web/.env.local`:
 
@@ -311,6 +313,7 @@ After the complete flow works in staging, contact your DogeOS representative wit
 | --- | --- |
 | `forge: command not found` or missing `forge-std/Script.sol` | Install Foundry, then run the dependency setup from `contracts/`. |
 | Wrong network or transaction rejected | Check the network, wallet approval, deployed address, and testnet DOGE balance. |
+| Questing sign-in returns `social_wallet_required` | Use a MyDoge Social wallet to create a new Questing account, or use an existing staging test account with its matching wallet. |
 | Event picker is empty | Select a registered contract whose ABI contains the event. |
 | Event name is ambiguous | Use an unambiguous event name; overloaded names are not supported by the current integration. |
 | Transaction succeeded but the quest did not complete | Check the contract/event, wallet mapping, active quest window, and that tracking existed before the event. |

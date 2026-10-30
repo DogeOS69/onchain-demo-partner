@@ -1,4 +1,5 @@
 import { Providers } from "./providers";
+import "@dogeos/dogeos-sdk/style.css";
 import "./globals.css";
 
 export const metadata = {
