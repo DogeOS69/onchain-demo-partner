@@ -135,8 +135,9 @@ function TriggerEventCard() {
       <p className="desc">
         Calls <code>trigger()</code> on EventEmitter to fire a{" "}
         <code>Triggered</code> event. Drives the{" "}
-        <strong>Smart Contract Event</strong> quest. Completes automatically
-        when DogeOS detects the on-chain event — no Verify click needed.
+        <strong>Smart Contract Event</strong> quest. DogeOS detects the event;
+        open the player app and click Verify if the quest requires manual
+        verification.
       </p>
       <div className="row">
         <button
@@ -214,11 +215,11 @@ function ExternalQuestCard() {
 
 export default function Page() {
   return (
-    <main>
+    <main className="partner-demo">
       <h1>DogeOS Onchain Quest Demo</h1>
       <p className="subtitle">
-        Each card drives one quest on {dogeosChain.name}. Open the player app
-        in another tab to watch them auto-complete.
+        Each card drives one quest on {dogeosChain.name}. Complete the action
+        here, then check the quest in the player app.
       </p>
       <ConnectBar />
       <TriggerEventCard />

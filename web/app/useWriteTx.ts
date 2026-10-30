@@ -11,20 +11,10 @@ import {
 import { useAccount, useConnectors, ChainTypeEnum } from "@dogeos/dogeos-sdk";
 import { dogeosChain } from "./chain";
 
-// Drop-in replacement for wagmi's `useWriteContract` that routes through
-// the DogeOS SDK's wallet provider (Tomo adapter).
-//
-// Why we can't use wagmi here:
-//   wagmi.useWriteContract needs an active wagmi connector to sign with.
-//   The DogeOS SDK opens its own modal and connects via Tomo's adapter —
-//   it does NOT register a wagmi connector. So `useWriteContract` from
-//   wagmi throws "Connector not connected" the moment you call it.
-//
-// What we do instead:
-//   `useConnectors()` from the SDK exposes the EVM provider (EIP-1193
-//   compatible) of the currently connected wallet. We use it directly with
-//   `eth_sendTransaction`, after auto-switching to the demo chain if the
-//   wallet is on the wrong one.
+// Submit through the active EIP-1193 wallet provider exposed by the SDK.
+// Reads and receipt tracking use the app's Wagmi configuration. SDK v4
+// also supports Wagmi synchronization; this demo keeps its direct-provider
+// transaction path and the existing testnet compatibility fallbacks below.
 //
 //   Tomo's embedded wallet routes some RPC calls through its own backend
 //   proxy (mydoge-wallet.tomo.inc), which doesn't have routing for the
