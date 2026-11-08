@@ -2,7 +2,7 @@
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo status:** this repository is a local/staging example. Its web app pins `@dogeos/dogeos-sdk@4.0.5`, the latest stable SDK release checked on October 29, 2026. It still pins `next@15.5.6`, which is affected by a [published security advisory](https://nextjs.org/blog/CVE-2025-66478); update and test supported dependencies before hosting it for users. The example eligibility route also needs real user authentication and action validation before use with real rewards.
+**Demo status:** this repository is a local/staging example. Its web app pins `@dogeos/dogeos-sdk@4.0.6`, the latest stable SDK release checked on November 7, 2026. It still pins `next@15.5.6`, which is affected by a [published security advisory](https://nextjs.org/blog/CVE-2025-66478); update and test supported dependencies before hosting it for users. The example eligibility route also needs real user authentication and action validation before use with real rewards.
 
 ## Contents
 
