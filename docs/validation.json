@@ -54,5 +54,62 @@
     "SDK social/email login requires the hosted origin to be registered; external SDK wallets are available.",
     "External Rule requires a staging partner API key and quest ID.",
     "Restricted testnet Alto instance uses safe-mode=false; not a general public bundler."
-  ]
+  ],
+  "verifiedAt": "2026-11-12T20:12:39.762977+00:00",
+  "browserAa": {
+    "base": "https://partner-demos-lab.up.railway.app",
+    "owner": "0x91279a099B18F4b3d80Eb54e6A16b50Fb79d4057",
+    "count": "3",
+    "transactionUrl": "https://dogeos-testnet.l2scan.co/tx/0xd689ea24c8828878fd26a748de97a21d532c04b6d8003e5b967921b5d66ce7b7",
+    "errors": [],
+    "personalSignCount": 1,
+    "ownerTransactionRequests": [],
+    "reloadRecovered": true,
+    "reconnectedAfterReload": false,
+    "sharedSdkConnection": true
+  },
+  "browserPages": {
+    "errors": [],
+    "routes": 5,
+    "mobileWidth": 360
+  },
+  "browserRandomness": {
+    "base": "http://127.0.0.1:5190",
+    "owner": "0x839d96365F9da0fFB335374331A70Dc730b62Ffb",
+    "automatic": "5",
+    "automaticFace": "5",
+    "manual": "6",
+    "manualFace": "1",
+    "transactions": [
+      {
+        "to": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+        "hash": "0xb796f5f13da6d2353de03d54ccab12086df96972e380c63358e35b2d5860c5ed"
+      },
+      {
+        "to": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+        "hash": "0xe6219f75acae49744e20e67aef4937db9e7a165fbe745682d24d06c31fd76691"
+      },
+      {
+        "to": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
+        "hash": "0xee6f68c18b9948e2b0dabe159c33ce70abb54c884df5bf1f3802371ad0decba5"
+      }
+    ],
+    "errors": [],
+    "balanceBefore": "415347541427202083",
+    "balanceAfter": "365114523240210586"
+  },
+  "browserOnchain": {
+    "transactionHash": "0x9c7b923caf1c6b9ae69cb0fb2806653630c885d3403c824bfbe3c6307b7127f5",
+    "status": "confirmed",
+    "route": "/onchain",
+    "sdkProvider": "injected EIP-1193 test provider, signing in Node"
+  },
+  "browserScope": "Real SDK UI and real Chikyu transactions with a test EIP-1193 provider. No human wallet extension or OAuth login was automated.",
+  "release": {
+    "sourceCommit": "10282c47ab28cf5e95c944320067347762452e81",
+    "webDeploymentId": "f9700fdf-7425-4541-a4d7-091383cb9268",
+    "sponsorDeploymentId": "df369b8d-0ee9-449f-a356-1c0e31b2b9e7",
+    "webStatus": "SUCCESS",
+    "sponsorStatus": "SUCCESS"
+  }
 }

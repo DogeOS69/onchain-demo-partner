@@ -92,3 +92,7 @@ Before a managed AA provider can replace the demo, ask it to confirm Chikyū cha
 For randomness, the corresponding handoff needs the drand network/public key, future-round selection, onchain verifier/callback ABI, proof-delivery and fee policy, availability, and upgrade controls. There is no required coupling between an AA provider and the randomness keeper.
 
 References: [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337), [Alto source](https://github.com/pimlicolabs/alto), [DogeOS SDK configuration](https://docs.dogeos.com/en/sdk/configuration), [Anyrand source](https://github.com/frogworksio/anyrand).
+
+The recorded browser run also submitted a real onchain event and completed both randomness modes through the SDK. Automatic request #5 and manual request #6 had their BLS signatures and results checked in the browser. AA reached counter 3 with one owner signature in the final run, no owner transaction requests, and recovery across reload/navigation. See [validation.json](validation.json) for the transaction hashes and exact test scope.
+
+To rerun the funded chain flows, use `TEST_KEY_FILE=/private/path/funded-testnet-wallet.json npm run test:browser:chain`. The test allows only the pinned example contracts, zero-value calls and bounded gas parameters. It sends real testnet transactions; use your own test wallet. The AA test can use an unfunded wallet.

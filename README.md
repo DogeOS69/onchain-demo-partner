@@ -21,7 +21,7 @@ External Rule still requires a staging partner key and quest ID. Its demo endpoi
 - [Going live](#going-live)
 - [Troubleshooting](#troubleshooting)
 
-Everything needed for the walkthrough is on this page. An optional [OpenAPI 3.1 document](docs/openapi.json) provides the endpoint contract for agents, API clients, and other tooling.
+The quest integration walkthrough is on this page. An optional [OpenAPI 3.1 document](docs/openapi.json) provides the endpoint contract for agents, API clients, and other tooling.
 
 ## Choose your integration
 
