@@ -1,0 +1,58 @@
+{
+  "chainId": 6281971,
+  "tests": {
+    "aaIntegrationGroups": 6,
+    "randomnessIntegrationTests": 5,
+    "nextProductionBuild": true
+  },
+  "liveAa": {
+    "id": "32c65961-0b59-4d24-b1ed-dcfcee9a95ec",
+    "status": "confirmed",
+    "chainId": 6281971,
+    "owner": "0x68Cac655e6b03179A594e316D35EA803A2E33076",
+    "account": "0xeea2ad4B018b312320f275A29a17767Eef324d6f",
+    "counter": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+    "counterBefore": "0",
+    "counterAfter": "1",
+    "userOpHash": "0x39b15288374238a935de9036671d385671099f78cc75f28e6a3ee40265507181",
+    "expiresAt": "2026-11-12T19:44:23.000Z",
+    "transactionHash": "0x99db84c55b0cb03327eae49402b8c7cd983f9358274b315fc95a049f74f956cf",
+    "blockNumber": "9419028",
+    "paymaster": "0x2be7db35831a06de47b5b5c55858cb14ecc308dd",
+    "networkFeeDoge": "0.05002925563803966",
+    "paymasterChargeDoge": "0.000005634929051744",
+    "userChargeDoge": "0",
+    "l1DataFeeDoge": "0.05002396940322962",
+    "confirmations": 18,
+    "requiredConfirmations": 18,
+    "userOperation": {
+      "sender": "0xeea2ad4B018b312320f275A29a17767Eef324d6f",
+      "nonce": "0x0",
+      "factory": "0x10f2e1986d392d4f5e63ea8a8d60c8da73f7dd2f",
+      "factoryData": "0x5fbfb9cf00000000000000000000000068cac655e6b03179a594e316d35ea803a2e3307600000000000000000000000000000000000000000000000000000000013528f8",
+      "callData": "0xb61d27f6000000000000000000000000935b84fc676958daf32ce333302f3b396bb4b7cb000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000004d09de08a00000000000000000000000000000000000000000000000000000000",
+      "verificationGasLimit": "0x47f6d",
+      "callGasLimit": "0x17ebd",
+      "preVerificationGas": "0xfc16",
+      "maxFeePerGas": "0x1588882",
+      "maxPriorityFeePerGas": "0x64",
+      "paymaster": "0x2be7db35831a06de47b5b5c55858cb14ecc308dd",
+      "paymasterVerificationGasLimit": "0x3583a",
+      "paymasterPostOpGasLimit": "0x0",
+      "paymasterData": "0x000000000000000000000000000000000000000000000000000000006af6171700000000000000000000000000000000000000000000000000071afd498d0000000000000000000000000000000000000000000000000000000000001dcd6500000000000000000000000000000000000000000000000000000000000016e36000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000414b1b3f82802a41c20ea05f35b85f0b6eaf78e56a54c442949e27132b65fdbd3c1ac1db3b374f53c35ede5031a4ad65733e7b1999740072b9021b90b47d76ff5b1c00000000000000000000000000000000000000000000000000000000000000",
+      "signature": "0x"
+    },
+    "verifiedAt": "2026-11-12T19:40:33.515Z",
+    "ownerBefore": "0",
+    "ownerAfter": "0",
+    "accountBefore": "0",
+    "accountAfter": "0",
+    "replayReturnedSameTransaction": true
+  },
+  "webUrl": "https://partner-demos-lab.up.railway.app",
+  "limitations": [
+    "SDK social/email login requires the hosted origin to be registered; external SDK wallets are available.",
+    "External Rule requires a staging partner API key and quest ID.",
+    "Restricted testnet Alto instance uses safe-mode=false; not a general public bundler."
+  ]
+}

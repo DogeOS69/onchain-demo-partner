@@ -32,7 +32,7 @@ export type WriteArgs = {
 };
 
 export type WriteState = {
-  writeContract: (args: WriteArgs) => Promise<void>;
+  writeContract: (args: WriteArgs) => Promise<`0x${string}` | undefined>;
   data?: `0x${string}`;
   error: Error | null;
   isPending: boolean;
@@ -250,6 +250,7 @@ export function useWriteTx(): WriteState {
         }
 
         setData(hash);
+        return hash;
       } catch (e) {
         const msg = ((e as Error).message ?? String(e)).toLowerCase();
         // Both Plan A and Plan B failed on the embedded wallet → tell the

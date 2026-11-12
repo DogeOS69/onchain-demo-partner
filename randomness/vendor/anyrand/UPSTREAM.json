@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/frogworksio/anyrand",
+  "commit": "4b17b49c4cad61b9cf5236e8d4a872dd1e84da30",
+  "copied": [
+    "contracts",
+    "audits",
+    "README.md"
+  ],
+  "modifications": "None. Demo consumer and operational tooling live outside vendor/."
+}

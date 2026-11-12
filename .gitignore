@@ -15,3 +15,12 @@ contracts/lib/
 
 # Misc
 .DS_Store
+# Runtime state can contain signed operations and bundler credentials.
+**/.runtime/
+**/test/results/
+**/dist/
+**/*.log
+.env*
+!.env.example
+
+**/*.tsbuildinfo

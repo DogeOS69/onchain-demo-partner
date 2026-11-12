@@ -26,6 +26,8 @@ const wagmiConfig = createConfig({
 // below.
 const dogeConfig: WalletConnectKitConfig = {
   clientId: process.env.NEXT_PUBLIC_DOGEOS_CLIENT_ID ?? "",
+  // External wallets remain available while this host awaits SDK project registration.
+  ...(process.env.NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED === 'true' ? {} : { login: { basicLogins: [], socialLogins: [] } }),
   walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   // Keep the SDK's default light modal and DogeOS yellow, as used in Questing.
   chains: {
@@ -40,8 +42,8 @@ const dogeConfig: WalletConnectKitConfig = {
     ],
   },
   metadata: {
-    name: "DogeOS Onchain Quest Demo",
-    description: "Reference dApp showing how a partner integrates with DogeOS quests.",
+    name: "DogeOS Demos",
+    description: "Small integration examples on DogeOS Chikyu.",
     url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
   },

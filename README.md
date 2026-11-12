@@ -1,11 +1,17 @@
-# DogeOS Partner Quest Demo
+# DogeOS Partner Demos
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo status:** this repository is a local/staging example. Its web app pins `@dogeos/dogeos-sdk@4.0.6`, the latest stable SDK release checked on November 7, 2026. It still pins `next@15.5.6`, which is affected by a [published security advisory](https://nextjs.org/blog/CVE-2025-66478); update and test supported dependencies before hosting it for users. The example eligibility route also needs real user authentication and action validation before use with real rewards.
+**Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Gas Sponsorship. The web app pins SDK `4.0.6`, Next.js `15.5.29`, and React `19.0.9`.
+
+The hosted AA demo uses a real ERC-4337 v0.7 paymaster and supports wallets with zero DOGE. See [AA setup and provider handoff](docs/aa-sponsorship.md) for contracts, API examples, costs, limits, and deployment. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
+
+External Rule still requires a staging partner key and quest ID. Its demo endpoint verifies a wallet signature, but real reward eligibility must also be validated by the partner's backend. Social/email login is disabled until the hosted origin is registered for the SDK project; external wallets connect through the same SDK.
 
 ## Contents
 
+- [AA setup and provider handoff](docs/aa-sponsorship.md)
+- [Randomness backend](randomness/README.md)
 - [Choose your integration](#choose-your-integration)
 - [Start in staging](#start-in-staging)
 - [Run the demo](#run-the-demo)
@@ -79,7 +85,7 @@ The script sends a deployment transaction and records the address in `contracts/
 | --- | --- |
 | Chain ID | `6281971` |
 | RPC | `https://rpc.testnet.dogeos.com/` |
-| Explorer | <https://blockscout.testnet.dogeos.com> |
+| Explorer | <https://dogeos-testnet.l2scan.co> |
 | Gas token | `DOGE` |
 
 ### Configure the web app
@@ -94,13 +100,13 @@ npm ci
 
 This installs the pinned SDK and its required peer dependencies from the lockfile. Do not use `--legacy-peer-deps`: omitting those peers can leave the SDK unable to build.
 
-The wallet popup uses the SDK's default light theme and DogeOS yellow (`#FCD436`), matching the Questing login popup. The demo's buttons, links, and balance use the same accent. To customize the popup, use the SDK's [theme configuration](https://docs.dogeos.com/en/sdk/configuration#theme) in [`web/app/providers.tsx`](web/app/providers.tsx); keep app styles scoped to `.partner-demo` so they do not override the SDK's controls.
+The wallet popup uses the SDK's default light theme and DogeOS yellow (`#FCD436`), matching the Questing login popup. The demo's buttons, links, and balance use the same accent. To customize the popup, use the SDK's [theme configuration](https://docs.dogeos.com/en/sdk/configuration#theme) in [`web/app/providers.tsx`](web/app/providers.tsx); keep app styles scoped to `.partner-demo-shell` so they do not override the SDK's controls.
 
 Edit `web/.env.local`:
 
 | Variable | Used for | Value |
 | --- | --- | --- |
-| `NEXT_PUBLIC_EVENT_EMITTER_ADDRESS` | Onchain event card | Your deployed contract address. |
+| `NEXT_PUBLIC_EVENT_EMITTER_ADDRESS` | Onchain route | Your deployed contract address. |
 | `NEXT_PUBLIC_DOGEOS_CLIENT_ID` | SDK wallet integration | Registered client ID from the [developer console](https://console.dogeos.com/). Use the Sandbox ID for development and configure the application origin. |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | WalletConnect | Your project ID, if using that connection method. |
 | `DOGEOS_ENV` | External Rule environment selector | `staging` for testing or `prod` for production. Unset or empty defaults to `staging`. |
@@ -121,9 +127,9 @@ Start the local app from `web/`:
 npm run dev
 ```
 
-Open <http://localhost:3000>, connect the same EVM wallet you use in Questing, and approve the network switch if prompted. Use only the card you configured. Create the onchain quest and configure tracking before clicking **Trigger event**.
+Open <http://localhost:3000>, connect the same EVM wallet you use in Questing, and approve the network switch if prompted. Open the route you configured. Create the onchain quest and configure tracking before clicking **Trigger event**.
 
-The example [server route](web/app/api/partner-complete-quest/route.ts) simulates a completed partner action. It accepts the browser's wallet address without authenticating the user or validating a real task. Keep this simulation local or in controlled staging; production must perform those checks before signaling eligibility.
+The example [server route](web/app/api/partner-complete-quest/route.ts) treats a signed demo action as its eligibility criterion. It verifies the wallet, exact origin, quest ID and a five-minute expiry. This proves consent to the demo action; a production partner must additionally verify that its real task was completed before granting rewards.
 
 ## Smart Contract Event
 
