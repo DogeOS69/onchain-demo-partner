@@ -1,8 +1,6 @@
 import assert from 'node:assert/strict';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
-import { createPublicClient, http, toHex } from '../sponsorship/node_modules/viem/_esm/index.js';
-import { privateKeyToAccount } from '../sponsorship/node_modules/viem/_esm/accounts/index.js';
 const base = process.env.WEB_URL || 'http://127.0.0.1:5190';
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });

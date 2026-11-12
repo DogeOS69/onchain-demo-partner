@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "test:browser": "node test/browser.mjs",
-    "test:browser:aa": "node test/browser-aa.mjs"
+    "test:browser:aa": "node test/browser-aa.mjs",
+    "test:browser:chain": "node test/browser-chain.mjs"
   },
-  "devDependencies": { "playwright": "1.58.2" }
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
 }

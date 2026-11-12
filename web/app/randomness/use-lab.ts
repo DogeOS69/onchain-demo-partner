@@ -30,6 +30,7 @@ export function useLab() {
   const [selectedId, setSelectedId] = useState<bigint | null>(null);
   const [extraRoll, setExtraRoll] = useState<Roll | null>(null);
   const [head, setHead] = useState<bigint>(0n);
+  const [blockTime, setBlockTime] = useState(0);
   const [now, setNow] = useState(0);
   const [count, setCount] = useState<bigint>(0n);
   const [keeper, setKeeper] = useState<Keeper | null>(null);
@@ -46,7 +47,7 @@ export function useLab() {
   const target = active ? config.genesis + (Number(active.round) - 1) * config.period : 0;
   const remaining = Math.max(0, target - now);
   const confirmations = active && head >= active.requestBlock ? Number(head - active.requestBlock + 1n) : 0;
-  const ready = !!active && remaining === 0 && confirmations >= config.minConfirmations;
+  const ready = !!active && blockTime >= target && confirmations >= config.minConfirmations;
   const keeperFresh = !!keeper?.lastPollAt && now - Math.floor(Date.parse(keeper.lastPollAt) / 1000) < 45;
   const keeperOnline = keeperFresh && ['watching', 'submitting', 'transaction-pending'].includes(keeper!.state);
   const keeperLabel = keeperOnline ? 'Keeper activo' : keeper?.state === 'low-balance' ? 'Keeper sin fondos' : keeper?.state === 'budget-limit' ? 'Límite del keeper' : 'Keeper no disponible';
@@ -56,11 +57,11 @@ export function useLab() {
     refreshLock.current = true;
     try {
       const [ids, block, total] = await Promise.all([
-        client.readContract({ ...demo, functionName: 'recentIds', args: [10n] }), client.getBlockNumber(),
+        client.readContract({ ...demo, functionName: 'recentIds', args: [10n] }), client.getBlock(),
         client.readContract({ ...demo, functionName: 'rollCount' }),
       ]);
       const data = await Promise.all(ids.map(readRoll));
-      setRolls(data); setHead(block); setCount(total); setRpcError(null);
+      setRolls(data); setHead(block.number); setBlockTime(Number(block.timestamp)); setCount(total); setRpcError(null);
       const wanted = preferredId ?? selectedRef.current;
       if (wanted && !ids.includes(wanted)) setExtraRoll(await readRoll(wanted));
       if (preferredId) { selectedRef.current = preferredId; setSelectedId(preferredId); }
