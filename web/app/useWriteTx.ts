@@ -49,7 +49,7 @@ function toHex(n: bigint): `0x${string}` {
 
 export function useWriteTx(): WriteState {
   const { connectors } = useConnectors();
-  const { chainId, switchChain } = useAccount();
+  const { switchChain } = useAccount();
   const [data, setData] = useState<`0x${string}` | undefined>(undefined);
   const [error, setError] = useState<Error | null>(null);
   const [isPending, setPending] = useState(false);
@@ -71,34 +71,17 @@ export function useWriteTx(): WriteState {
           );
         }
 
-        // First: register the chain with the wallet so its internal RPC
-        // proxy knows where to fetch nonce/gas. Without this the Tomo
-        // embedded wallet falls back to `mydoge-wallet.tomo.inc/rpc/v1/eth`
-        // which doesn't have DogeOS testnet → 500 on eth_getTransactionCount.
-        try {
-          await provider.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: `0x${dogeosChain.id.toString(16)}`,
-                chainName: dogeosChain.name,
-                nativeCurrency: dogeosChain.nativeCurrency,
-                rpcUrls: dogeosChain.rpcUrls.default.http,
-                blockExplorerUrls: dogeosChain.blockExplorers
-                  ? [dogeosChain.blockExplorers.default.url]
-                  : undefined,
-              },
-            ],
-          });
-        } catch {
-          // Wallet may already have it / may not support add → ignore.
+        // Read the wallet itself: React's cached chain can lag behind it.
+        // The SDK requests an add only if switching returns unknown chain
+        // (4902), preserving the wallet's confirmation and cancellation.
+        const walletChainId = Number(await provider.request({ method: "eth_chainId" }));
+        if (!Number.isSafeInteger(walletChainId) || walletChainId <= 0) {
+          throw new Error("Wallet returned an invalid chain ID.");
         }
-
-        // Auto-switch to the demo chain if needed.
-        if (chainId && Number(chainId) !== dogeosChain.id) {
+        if (walletChainId !== dogeosChain.id) {
           if (!switchChain) {
             throw new Error(
-              `Wallet is on chain ${chainId}, demo expects ${dogeosChain.id}. Switch manually.`
+              `Wallet is on chain ${walletChainId}, demo expects ${dogeosChain.id}. Switch manually.`
             );
           }
           await switchChain({
@@ -111,6 +94,9 @@ export function useWriteTx(): WriteState {
               blockExplorers: dogeosChain.blockExplorers,
             } as never,
           });
+          if (Number(await provider.request({ method: "eth_chainId" })) !== dogeosChain.id) {
+            throw new Error("Select DogeOS Chikyū in your wallet before sending a transaction.");
+          }
         }
 
         const accounts = (await provider.request({
@@ -270,7 +256,7 @@ export function useWriteTx(): WriteState {
         setPending(false);
       }
     },
-    [connectors, chainId, switchChain]
+    [connectors, switchChain]
   );
 
   return { writeContract, data, error, isPending };

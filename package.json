@@ -5,7 +5,8 @@
   "scripts": {
     "test:browser": "node test/browser.mjs",
     "test:browser:aa": "node test/browser-aa.mjs",
-    "test:browser:chain": "node test/browser-chain.mjs"
+    "test:browser:chain": "node test/browser-chain.mjs",
+    "test:browser:network": "node test/browser-network.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.2"

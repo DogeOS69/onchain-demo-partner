@@ -8,6 +8,8 @@ The hosted AA demo uses a real ERC-4337 v0.7 paymaster and supports wallets with
 
 The hosted demo offers Google and X sign-in through its own registered DogeOS client, matching Questing, and connects the EVM wallet for all four routes. DogeOS manages the OAuth providers; no Google or X credentials belong in this app.
 
+Chikyū's network details are configured in the SDK. Before sending an onchain event, the demo checks the wallet's active network and switches only when needed. The SDK requests permission to add Chikyū only if the wallet reports it as unknown; cancelling stops the submission.
+
 External Rule still requires a staging partner key and quest ID. Its demo endpoint verifies a wallet signature, but real reward eligibility must also be validated by the partner's backend.
 
 ## Contents
