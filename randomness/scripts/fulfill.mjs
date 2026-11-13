@@ -1,0 +1,14 @@
+import { clients, assertChikyu, readDeployment, contract, stringify } from '../lib/chain.mjs';
+import { fetchRound, signatureToEvm } from '../lib/drand.mjs';
+import { sendContract } from '../lib/transactions.mjs';
+const id = BigInt(process.argv[2] || '0');
+if (!id) throw new Error('Usage: npm run fulfill -- REQUEST_ID');
+const c = clients({ signing: true }); await assertChikyu(c.publicClient);
+const d = readDeployment(), demo = contract(d, 'RandomnessDemo'), coordinator = contract(d, 'Coordinator');
+const roll = await c.publicClient.readContract({ ...demo, functionName: 'getRoll', args: [id] });
+const head = await c.publicClient.getBlock();
+if (head.number - roll.requestBlock + 1n < 18n) throw new Error('Wait for 18 request confirmations');
+const signature = signatureToEvm((await fetchRound(roll.round)).signature);
+const pubKeyHash = await c.publicClient.readContract({ ...demo, functionName: 'pubKeyHash' });
+const result = await sendContract({ ...c, contract: coordinator, functionName: 'fulfillRandomness', args: [id, demo.address, pubKeyHash, roll.round, 150000n, signature] });
+console.log(stringify({ hash: result.hash, roll: await c.publicClient.readContract({ ...demo, functionName: 'getRoll', args: [id] }) }));

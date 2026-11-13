@@ -1,0 +1,43 @@
+{
+  "chainId": 6281971,
+  "rpcUrl": "https://rpc.testnet.dogeos.com",
+  "explorerUrl": "https://dogeos-testnet.l2scan.co",
+  "entryPointVersion": "0.7",
+  "entryPoint": "0x799ccb45f55ba51050fec1d2a1b30b65f99c4e81",
+  "accountFactory": "0x10f2e1986d392d4f5e63ea8a8d60c8da73f7dd2f",
+  "accountImplementation": "0x30aACD0f45bc25878b264baf36A83858a2169ba0",
+  "counter": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+  "entryPointSimulations": "0x83f6d7913e64089e497e4554208657c68fbd31f2",
+  "pimlicoSimulations": "0x526da1072f23fd17b56906ea77bc712086229e69",
+  "contracts": {
+    "EntryPoint": {
+      "address": "0x799ccb45f55ba51050fec1d2a1b30b65f99c4e81",
+      "bytecodeHash": "0x30516d9cdbeabfaf62ea32d081a10ee3b95b92e5549cfc86353bbe85741c1404",
+      "creationDataHash": "0x30516d9cdbeabfaf62ea32d081a10ee3b95b92e5549cfc86353bbe85741c1404",
+      "runtimeCodeHash": "0x9bc0d09bbdda0f0839b5b79185eb29315b4fdd44983af2d044fe588489fab234",
+      "transactionHash": "0x73e78d236e7256b85cb822ebf5e0899bdc8e777a104176e18977106a6477b119"
+    },
+    "SimpleAccountFactory": {
+      "address": "0x10f2e1986d392d4f5e63ea8a8d60c8da73f7dd2f",
+      "bytecodeHash": "0x2e4b2194efbc7fd73d749dee9f3a8a601a35fff2a87576bc970684083ed67cad",
+      "creationDataHash": "0x410b88ceddbb8332a123aa95eb5e480c4bba665b9f69e016d85e22c9d9cce75b",
+      "runtimeCodeHash": "0x2ffe0d09788984a474e0e993c09b779838d1004f16ddb3ccbbdc6865618c54cb",
+      "transactionHash": "0xb381f867ccd232e2893b58222e96bed5f087bc7096ab0d56815132b7a639ac89"
+    },
+    "EntryPointSimulations07": {
+      "address": "0x83f6d7913e64089e497e4554208657c68fbd31f2",
+      "bytecodeHash": "0x59a0002bf6006be76b96342aa70af03d043032577ca95505e55ed9a8c4450a7b",
+      "creationDataHash": "0x59a0002bf6006be76b96342aa70af03d043032577ca95505e55ed9a8c4450a7b",
+      "runtimeCodeHash": "0xe5176cbe33a36adb1e08d93d89256411561b31d62fc7a6be977b00aea82e2216",
+      "transactionHash": "0x0d734e96aa5a1b28e3f5ffd25f1e37fc09629b441c15a7349a6d1552baad292c"
+    },
+    "PimlicoSimulations": {
+      "address": "0x526da1072f23fd17b56906ea77bc712086229e69",
+      "bytecodeHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
+      "creationDataHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
+      "runtimeCodeHash": "0x22dbcbfa136fcf31bd56a73a11492356bbfac658009dc867cfb0a61485bd7b37",
+      "transactionHash": "0x0997d29a4434bd4112b8d29bdb618ef3928e0ac0fafa7e672a333cb4d2a51e11"
+    }
+  },
+  "accountSalt": "20261112"
+}
