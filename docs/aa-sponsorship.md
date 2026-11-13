@@ -71,7 +71,7 @@ For your own paymaster, set `SPONSOR_KEY_FILE` to a private path outside the rep
 
 After deployment copy `sponsorship/config/chikyu.json` to `web/app/sponsorship/deployment.json`. Pin this reviewed manifest in the frontend; never let an untrusted server choose the addresses to sign for.
 
-Start the service with `SPONSOR_KEY_FILE=/private/path/keys.json npm --prefix sponsorship start`. Set `SPONSOR_API_URL=http://127.0.0.1:4341`, `WEB_ORIGIN=http://localhost:3000`, and the registered public SDK client ID in `web/.env.local`, then run `npm --prefix web run dev`. Social/email login also needs `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=true` and the exact origin registered for that client. With it disabled, the SDK offers external wallets.
+Start the service with `SPONSOR_KEY_FILE=/private/path/keys.json npm --prefix sponsorship start`. Set `SPONSOR_API_URL=http://127.0.0.1:4341`, `WEB_ORIGIN=http://localhost:3000`, and the registered public SDK client ID in `web/.env.local`, then run `npm --prefix web run dev`. Google and X sign-in also needs `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=true` and the exact origin registered for that client. The hosted demo uses this configuration and defaults to the EVM wallet, as Questing does. With it disabled, the SDK offers external wallets. Public settings are embedded at build time, so rebuild after changing them.
 
 ## Hosting
 

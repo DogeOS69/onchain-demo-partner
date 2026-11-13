@@ -2,11 +2,13 @@
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Gas Sponsorship. The web app pins SDK `4.0.6`, Next.js `15.5.29`, and React `19.0.9`.
+**Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Gas Sponsorship. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`.
 
 The hosted AA demo uses a real ERC-4337 v0.7 paymaster and supports wallets with zero DOGE. See [AA setup and provider handoff](docs/aa-sponsorship.md) for contracts, API examples, costs, limits, and deployment. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
 
-External Rule still requires a staging partner key and quest ID. Its demo endpoint verifies a wallet signature, but real reward eligibility must also be validated by the partner's backend. Social/email login is disabled until the hosted origin is registered for the SDK project; external wallets connect through the same SDK.
+The hosted demo offers Google and X sign-in through its own registered DogeOS client, matching Questing, and connects the EVM wallet for all four routes. DogeOS manages the OAuth providers; no Google or X credentials belong in this app.
+
+External Rule still requires a staging partner key and quest ID. Its demo endpoint verifies a wallet signature, but real reward eligibility must also be validated by the partner's backend.
 
 ## Contents
 
@@ -100,7 +102,7 @@ npm ci
 
 This installs the pinned SDK and its required peer dependencies from the lockfile. Do not use `--legacy-peer-deps`: omitting those peers can leave the SDK unable to build.
 
-The wallet popup uses the SDK's default light theme and DogeOS yellow (`#FCD436`), matching the Questing login popup. The demo's buttons, links, and balance use the same accent. To customize the popup, use the SDK's [theme configuration](https://docs.dogeos.com/en/sdk/configuration#theme) in [`web/app/providers.tsx`](web/app/providers.tsx); keep app styles scoped to `.partner-demo-shell` so they do not override the SDK's controls.
+The wallet popup uses the SDK's default light theme and DogeOS yellow (`#FCD436`), matching the Questing login popup. The surrounding demo uses the DogeOS Faucet's neutral palette and green action accent. To customize the popup, use the SDK's [theme configuration](https://docs.dogeos.com/en/sdk/configuration#theme) in [`web/app/providers.tsx`](web/app/providers.tsx); keep app styles scoped to `.partner-demo-shell` so they do not override the SDK's controls.
 
 Edit `web/.env.local`:
 
@@ -108,6 +110,7 @@ Edit `web/.env.local`:
 | --- | --- | --- |
 | `NEXT_PUBLIC_EVENT_EMITTER_ADDRESS` | Onchain route | Your deployed contract address. |
 | `NEXT_PUBLIC_DOGEOS_CLIENT_ID` | SDK wallet integration | Registered client ID from the [developer console](https://console.dogeos.com/). Use the Sandbox ID for development and configure the application origin. |
+| `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED` | Questing-style sign-in | `true` enables Google and X with the EVM wallet. `false` offers external wallets instead. Register the exact hosted origin for the matching client, then rebuild. |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | WalletConnect | Your project ID, if using that connection method. |
 | `DOGEOS_ENV` | External Rule environment selector | `staging` for testing or `prod` for production. Unset or empty defaults to `staging`. |
 | `DOGEOS_STAGING_API_URL` | Staging External Rule backend | `https://quest-api-staging.dogeos.com`. |

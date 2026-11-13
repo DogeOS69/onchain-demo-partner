@@ -51,7 +51,6 @@
   },
   "webUrl": "https://partner-demos-lab.up.railway.app",
   "limitations": [
-    "SDK social/email login requires the hosted origin to be registered; external SDK wallets are available.",
     "External Rule requires a staging partner API key and quest ID.",
     "Restricted testnet Alto instance uses safe-mode=false; not a general public bundler."
   ],
@@ -106,8 +105,8 @@
   },
   "browserScope": "Real SDK UI and real Chikyu transactions with a test EIP-1193 provider. No human wallet extension or OAuth login was automated.",
   "release": {
-    "sourceCommit": "55f626a9d4a14ab6e638a504698e1f6f6bb9f650",
-    "webDeploymentId": "2ba28c95-1920-4486-b85f-1bb6a8e54e0e",
+    "sourceCommit": "626032e046b3242a3ed03a058c983bf9fe46aba5",
+    "webDeploymentId": "342113ad-ff47-416d-954d-ef7d7ab1c1ab",
     "sponsorDeploymentId": "df369b8d-0ee9-449f-a356-1c0e31b2b9e7",
     "webStatus": "SUCCESS",
     "sponsorStatus": "SUCCESS"
@@ -137,5 +136,71 @@
     "pageErrors": [],
     "newUiDependencies": 0,
     "scope": "Presentation check with a read-only injected EIP-1193 test provider. No signing or transactions; functional evidence above is from the earlier integration runs."
+  },
+  "socialLogin": {
+    "verifiedAt": "2026-11-13T01:30:45.148Z",
+    "base": "https://partner-demos-lab.up.railway.app",
+    "sdkVersion": "4.1.0",
+    "enabled": true,
+    "providers": [
+      "google",
+      "x"
+    ],
+    "defaultConnectChain": "evm",
+    "clientInHostedBundle": true,
+    "routes": [
+      {
+        "route": "/",
+        "status": 200
+      },
+      {
+        "route": "/external",
+        "status": 200
+      },
+      {
+        "route": "/onchain",
+        "status": 200
+      },
+      {
+        "route": "/randomness",
+        "status": 200
+      },
+      {
+        "route": "/sponsorship",
+        "status": 200
+      }
+    ],
+    "modalWidths": [
+      {
+        "width": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "width": 390,
+        "documentWidth": 390
+      },
+      {
+        "width": 320,
+        "documentWidth": 320
+      }
+    ],
+    "providerHandoffs": [
+      {
+        "provider": "Google",
+        "handoff": "https://accounts.google.com/v3/signin/identifier"
+      },
+      {
+        "provider": "X",
+        "handoff": "https://x.com/i/oauth2/authorize"
+      }
+    ],
+    "flowCreationStatuses": [
+      200,
+      200
+    ],
+    "pageErrors": [],
+    "signedIn": false,
+    "scope": "Fresh browser, visible Google/X options and provider handoff only. No credentials, consent, wallet signatures or transactions.",
+    "passed": true
   }
 }
