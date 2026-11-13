@@ -40,7 +40,7 @@ export async function fetchProof(round: bigint) {
       const response = await fetch(`${relay}/v2/beacons/${config.beaconHash}/rounds/${round}`, { signal: AbortSignal.timeout(8000) });
       if (!response.ok) throw new Error(`drand: HTTP ${response.status}`);
       const data = await response.json() as { round: number; signature: string };
-      if (BigInt(data.round) !== round || !/^[0-9a-f]{128}$/i.test(data.signature)) throw new Error('La prueba recibida no corresponde a esta ronda.');
+      if (BigInt(data.round) !== round || !/^[0-9a-f]{128}$/i.test(data.signature)) throw new Error('The received proof does not match this round.');
       const signature: readonly [bigint, bigint] = [BigInt(`0x${data.signature.slice(0, 64)}`), BigInt(`0x${data.signature.slice(64)}`)];
       await client.readContract({ ...beacon, functionName: 'verifyBeaconRound', args: [round, signature] });
       return { signature, hex: `0x${data.signature}` };

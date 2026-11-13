@@ -11,8 +11,8 @@ type TxLinks = Record<string, { request?: Hash; fulfill?: Hash }>;
 export const short = (value: string, n = 6) => `${value.slice(0, n)}…${value.slice(-4)}`;
 function errorText(error: unknown) {
   const e = error as { shortMessage?: string; message?: string; code?: number };
-  if (e.code === 4001 || /rejected|denied|rechaz/i.test(e.shortMessage || e.message || '')) return 'Cancelaste la firma. Podés intentarlo de nuevo cuando quieras.';
-  return (e.shortMessage || e.message || 'No se pudo completar la acción. Intentá de nuevo.').slice(0, 240);
+  if (e.code === 4001 || /rejected|denied|rechaz/i.test(e.shortMessage || e.message || '')) return 'You canceled the wallet request. You can try again.';
+  return (e.shortMessage || e.message || 'Could not complete the action. Please try again.').slice(0, 240);
 }
 
 
@@ -50,7 +50,7 @@ export function useLab() {
   const ready = !!active && blockTime >= target && confirmations >= config.minConfirmations;
   const keeperFresh = !!keeper?.lastPollAt && now - Math.floor(Date.parse(keeper.lastPollAt) / 1000) < 45;
   const keeperOnline = keeperFresh && ['watching', 'submitting', 'transaction-pending'].includes(keeper!.state);
-  const keeperLabel = keeperOnline ? 'Keeper activo' : keeper?.state === 'low-balance' ? 'Keeper sin fondos' : keeper?.state === 'budget-limit' ? 'Límite del keeper' : 'Keeper no disponible';
+  const keeperLabel = keeperOnline ? 'Keeper active' : keeper?.state === 'low-balance' ? 'Keeper out of funds' : keeper?.state === 'budget-limit' ? 'Keeper limit reached' : 'Keeper unavailable';
 
   const refresh = useCallback(async (preferredId?: bigint) => {
     if (refreshLock.current) return;
@@ -65,7 +65,7 @@ export function useLab() {
       const wanted = preferredId ?? selectedRef.current;
       if (wanted && !ids.includes(wanted)) setExtraRoll(await readRoll(wanted));
       if (preferredId) { selectedRef.current = preferredId; setSelectedId(preferredId); }
-    } catch (e) { setRpcError(`No pudimos actualizar Chikyū. ${errorText(e)}`); }
+    } catch (e) { setRpcError(`Could not refresh Chikyū data. ${errorText(e)}`); }
     finally { refreshLock.current = false; setLoading(false); }
   }, []);
 
@@ -111,9 +111,9 @@ export function useLab() {
   }
   async function wallet() {
     const p = provider();
-    if (!p) throw new Error('Abrí esta página en una wallet EVM o instalá MetaMask/Rabby para firmar. Podés explorar los resultados sin conectar.');
+    if (!p) throw new Error('Connect a wallet to sign. You can explore the results without connecting.');
     const addresses = await p.request({ method: 'eth_requestAccounts' });
-    if (!addresses.length) throw new Error('La wallet no compartió una cuenta.');
+    if (!addresses.length) throw new Error('The wallet did not share an account.');
     if (Number(await p.request({ method: 'eth_chainId' })) !== chain.id) {
       try { await p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: toHex(chain.id) }] }); }
       catch (e) {
@@ -123,62 +123,62 @@ export function useLab() {
       }
     }
     const id = Number(await p.request({ method: 'eth_chainId' }));
-    if (id !== chain.id) throw new Error('Seleccioná DogeOS Chikyū en tu wallet.');
+    if (id !== chain.id) throw new Error('Select DogeOS Chikyū in your wallet.');
     if (!account || addresses[0].toLowerCase() !== account.toLowerCase()) throw new Error('Wallet changed. Try again.');
     return createWalletClient({ account: addresses[0], chain, transport: custom(p) });
   }
   async function connect() { openModal(); }
   async function requestRoll() {
-    setError(null); setNotice(null); setProof(null); setBusy('Preparando solicitud…');
+    setError(null); setNotice(null); setProof(null); setBusy('Preparing request…');
     try {
       const w = await wallet(); const gasPrice = await client.getGasPrice();
       const quote = await client.call({ to: demo.address, data: encodeFunctionData({ abi: demo.abi, functionName: 'quote' }), gasPrice });
-      if (!quote.data) throw new Error('No se pudo consultar la comisión.');
+      if (!quote.data) throw new Error('Could not retrieve the fee quote.');
       const value = decodeFunctionResult({ abi: demo.abi, functionName: 'quote', data: quote.data });
       const { request } = await client.simulateContract({ ...demo, functionName: 'requestRoll', args: [mode === 'auto'], account: w.account, value, gasPrice });
-      setBusy('Confirmá la solicitud en tu wallet…');
+      setBusy('Confirm the request in your wallet…');
       const hash = await writeContract({ address: request.address, abi: request.abi, functionName: request.functionName, args: request.args, value: request.value });
-      if (!hash) throw new Error('The wallet did not submit the transaction.'); setBusy('Esperando la transacción…');
+      if (!hash) throw new Error('The wallet did not submit the transaction.'); setBusy('Waiting for the transaction…');
       const receipt = await client.waitForTransactionReceipt({ hash, timeout: 180000 });
-      if (receipt.status !== 'success') throw new Error('La transacción revirtió. Revisá el explorador.');
+      if (receipt.status !== 'success') throw new Error('The transaction reverted. Check the explorer.');
       const events = receipt.logs.filter(l => l.address.toLowerCase() === demo.address.toLowerCase()).map(l => decodeEventLog({ abi: demo.abi, ...l }));
       const event = events.find(e => e.eventName === 'RollRequested');
-      if (!event || event.eventName !== 'RollRequested') throw new Error('No se encontró la solicitud en el recibo.');
+      if (!event || event.eventName !== 'RollRequested') throw new Error('The request was not found in the transaction receipt.');
       const id = event.args.requestId;
       select(id); saveLink(id, 'request', hash); await refresh(id);
-      setNotice(`Solicitud #${id} confirmada. La ronda ya está fijada en el contrato.`);
+      setNotice(`Request #${id} confirmed. The round is now fixed in the contract.`);
     } catch (e) { setError(errorText(e)); } finally { setBusy(null); }
   }
   async function fulfill() {
     if (!active) return;
     const chosen = active;
-    setError(null); setNotice(null); setBusy('Verificando la prueba de drand…');
+    setError(null); setNotice(null); setBusy('Verifying the drand proof…');
     try {
       const w = await wallet(); const latest = await client.getBlock();
-      if (latest.number - chosen.requestBlock + 1n < BigInt(config.minConfirmations) || Number(latest.timestamp) < target) throw new Error('Esperá la ronda y las 18 confirmaciones antes de enviar la prueba.');
+      if (latest.number - chosen.requestBlock + 1n < BigInt(config.minConfirmations) || Number(latest.timestamp) < target) throw new Error('Wait for the round and 18 confirmations before submitting the proof.');
       const { signature } = await fetchProof(chosen.round);
       const pubKeyHash = await client.readContract({ ...demo, functionName: 'pubKeyHash' });
       const { request } = await client.simulateContract({ ...coordinator, functionName: 'fulfillRandomness', args: [chosen.id, demo.address, pubKeyHash, chosen.round, 150000n, signature], account: w.account });
-      setBusy('Confirmá el envío de la prueba…');
+      setBusy('Confirm the proof submission in your wallet…');
       const hash = await writeContract({ address: request.address, abi: request.abi, functionName: request.functionName, args: request.args, value: request.value });
-      if (!hash) throw new Error('The wallet did not submit the transaction.'); saveLink(chosen.id, 'fulfill', hash); setBusy('Verificando en Chikyū…');
+      if (!hash) throw new Error('The wallet did not submit the transaction.'); saveLink(chosen.id, 'fulfill', hash); setBusy('Verifying on Chikyū…');
       const receipt = await client.waitForTransactionReceipt({ hash, timeout: 180000 });
-      if (receipt.status !== 'success') throw new Error('La entrega revirtió. Es posible que otro actor haya entregado antes.');
-      await refresh(chosen.id); setNotice('Prueba enviada. Consultá el resultado registrado en el contrato.');
+      if (receipt.status !== 'success') throw new Error('The proof submission reverted. Another participant may have submitted it first.');
+      await refresh(chosen.id); setNotice('Proof submitted. Check the result recorded in the contract.');
     } catch (e) { setError(errorText(e)); await refresh(); } finally { setBusy(null); }
   }
   async function verify() {
     if (!active?.fulfilled) return;
     const chosen = active;
-    setBusy('Contrastando firma y resultado…'); setError(null); setNotice(null);
+    setBusy('Checking the signature and result…'); setError(null); setNotice(null);
     try {
       const { signature, hex } = await fetchProof(chosen.round);
       const expected = BigInt(keccak256(encodeAbiParameters([
         { type: 'uint256' }, { type: 'uint256' }, { type: 'uint256' }, { type: 'address' }, { type: 'uint256' }, { type: 'address' },
       ], [signature[0], signature[1], BigInt(chain.id), coordinator.address, chosen.id, demo.address])));
       const face = await client.readContract({ ...demo, functionName: 'diceFace', args: [expected] });
-      if (expected !== chosen.word || face !== chosen.face) throw new Error('El resultado almacenado no coincide con la prueba.');
-      setProof({ id: chosen.id, hex }); setNotice('Firma BLS válida. La palabra aleatoria y el dado coinciden con el resultado on-chain.');
+      if (expected !== chosen.word || face !== chosen.face) throw new Error('The stored result does not match the proof.');
+      setProof({ id: chosen.id, hex }); setNotice('Valid BLS signature. The random value and die roll match the onchain result.');
     } catch (e) { setError(errorText(e)); } finally { setBusy(null); }
   }
   return { account, walletChain, balance, mode, setMode, rolls, selectedId, active, remaining, confirmations, ready,
