@@ -105,8 +105,8 @@
   },
   "browserScope": "Real SDK UI and real Chikyu transactions with a test EIP-1193 provider. No human wallet extension or OAuth login was automated.",
   "release": {
-    "sourceCommit": "626032e046b3242a3ed03a058c983bf9fe46aba5",
-    "webDeploymentId": "342113ad-ff47-416d-954d-ef7d7ab1c1ab",
+    "sourceCommit": "2969b61a1652aa2b49b7eb103ecc978a235e383d",
+    "webDeploymentId": "6d60e2eb-9a50-423b-bac8-f1a3b0ef9dab",
     "sponsorDeploymentId": "df369b8d-0ee9-449f-a356-1c0e31b2b9e7",
     "webStatus": "SUCCESS",
     "sponsorStatus": "SUCCESS"
@@ -202,5 +202,77 @@
     "signedIn": false,
     "scope": "Fresh browser, visible Google/X options and provider handoff only. No credentials, consent, wallet signatures or transactions.",
     "passed": true
+  },
+  "networkSelection": {
+    "base": "http://127.0.0.1:5190",
+    "verifiedAt": "2026-11-13T01:43:23.240Z",
+    "cases": [
+      {
+        "name": "already on Chikyu",
+        "requests": [
+          "eth_sendTransaction"
+        ]
+      },
+      {
+        "name": "repeat transaction on Chikyu",
+        "requests": [
+          "eth_sendTransaction"
+        ]
+      },
+      {
+        "name": "known network, stale React state",
+        "requests": [
+          "wallet_switchEthereumChain",
+          "eth_sendTransaction"
+        ]
+      },
+      {
+        "name": "unknown network",
+        "requests": [
+          "wallet_switchEthereumChain",
+          "wallet_addEthereumChain",
+          "wallet_switchEthereumChain",
+          "eth_sendTransaction"
+        ]
+      },
+      {
+        "name": "rejected switch",
+        "requests": [
+          "wallet_switchEthereumChain"
+        ]
+      },
+      {
+        "name": "rejected add",
+        "requests": [
+          "wallet_switchEthereumChain",
+          "wallet_addEthereumChain"
+        ]
+      },
+      {
+        "name": "wallet ignores switch",
+        "requests": [
+          "wallet_switchEthereumChain"
+        ]
+      },
+      {
+        "name": "invalid chain ID",
+        "requests": []
+      }
+    ],
+    "pageErrors": [],
+    "signedTransactions": 0,
+    "broadcastTransactions": 0,
+    "hosted": {
+      "base": "https://partner-demos-lab.up.railway.app",
+      "verifiedAt": "2026-11-13T01:47:25.704Z",
+      "deploymentId": "6d60e2eb-9a50-423b-bac8-f1a3b0ef9dab",
+      "pageErrors": [],
+      "updatedNetworkGuard": true,
+      "expectedClient": true,
+      "googleAndXVisible": true,
+      "health": {
+        "ready": true
+      }
+    }
   }
 }
