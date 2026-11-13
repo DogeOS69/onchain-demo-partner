@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import type { WalletConnectKitConfig } from "@dogeos/dogeos-sdk";
+import type { ChainType, WalletConnectKitConfig } from "@dogeos/dogeos-sdk";
 import dynamic from "next/dynamic";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -26,8 +26,11 @@ const wagmiConfig = createConfig({
 // below.
 const dogeConfig: WalletConnectKitConfig = {
   clientId: process.env.NEXT_PUBLIC_DOGEOS_CLIENT_ID ?? "",
-  // External wallets remain available while this host awaits SDK project registration.
-  ...(process.env.NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED === 'true' ? {} : { login: { basicLogins: [], socialLogins: [] } }),
+  // Match Questing: Google/X sign-in connects the EVM wallet.
+  defaultConnectChain: "evm" as ChainType,
+  login: process.env.NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED === "true"
+    ? { basicLogins: [], socialLogins: [{ type: "google" }, { type: "x" }] }
+    : { basicLogins: ["externalWallets"], socialLogins: [] },
   walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   // Keep the SDK's default light modal and DogeOS yellow, as used in Questing.
   chains: {
@@ -45,7 +48,7 @@ const dogeConfig: WalletConnectKitConfig = {
     name: "DogeOS Demos",
     description: "Small integration examples on DogeOS Chikyu.",
     url: typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
-    icons: ["https://avatars.githubusercontent.com/u/37784886"],
+    icons: [typeof window !== "undefined" ? `${window.location.origin}/brand/doge.png` : "/brand/doge.png"],
   },
 };
 
