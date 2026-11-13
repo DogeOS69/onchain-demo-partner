@@ -106,10 +106,36 @@
   },
   "browserScope": "Real SDK UI and real Chikyu transactions with a test EIP-1193 provider. No human wallet extension or OAuth login was automated.",
   "release": {
-    "sourceCommit": "10282c47ab28cf5e95c944320067347762452e81",
-    "webDeploymentId": "f9700fdf-7425-4541-a4d7-091383cb9268",
+    "sourceCommit": "55f626a9d4a14ab6e638a504698e1f6f6bb9f650",
+    "webDeploymentId": "2ba28c95-1920-4486-b85f-1bb6a8e54e0e",
     "sponsorDeploymentId": "df369b8d-0ee9-449f-a356-1c0e31b2b9e7",
     "webStatus": "SUCCESS",
     "sponsorStatus": "SUCCESS"
+  },
+  "visualStyle": {
+    "verifiedAt": "2026-11-13T00:20:10.882451+00:00",
+    "base": "https://partner-demos-lab.up.railway.app",
+    "reference": "https://github.com/DogeOS69/dogeos-faucet/tree/c46a6d4edfd8872f71e3ed7a82bce0c661514c98",
+    "routes": [
+      "/",
+      "/external",
+      "/onchain",
+      "/randomness",
+      "/sponsorship"
+    ],
+    "viewportWidths": [
+      1440,
+      390,
+      320
+    ],
+    "fontsAndLogoLoaded": true,
+    "horizontalOverflow": false,
+    "activeNavigation": true,
+    "walletDialogAndConnectedLayout": true,
+    "sharedSdkConnection": true,
+    "proofDeliverySelect": true,
+    "pageErrors": [],
+    "newUiDependencies": 0,
+    "scope": "Presentation check with a read-only injected EIP-1193 test provider. No signing or transactions; functional evidence above is from the earlier integration runs."
   }
 }
