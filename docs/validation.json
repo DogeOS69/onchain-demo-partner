@@ -105,8 +105,8 @@
   },
   "browserScope": "Real SDK UI and real Chikyu transactions with a test EIP-1193 provider. No human wallet extension or OAuth login was automated.",
   "release": {
-    "sourceCommit": "2969b61a1652aa2b49b7eb103ecc978a235e383d",
-    "webDeploymentId": "6d60e2eb-9a50-423b-bac8-f1a3b0ef9dab",
+    "sourceCommit": "0a7107ebfc9aa35e59d536f21b3891b00f5d1aca",
+    "webDeploymentId": "af88aec0-04a7-4d6b-bcc5-ce179b9d3fe1",
     "sponsorDeploymentId": "df369b8d-0ee9-449f-a356-1c0e31b2b9e7",
     "webStatus": "SUCCESS",
     "sponsorStatus": "SUCCESS"
@@ -274,5 +274,46 @@
         "ready": true
       }
     }
+  },
+  "englishCopy": {
+    "base": "https://partner-demos-lab.up.railway.app",
+    "verifiedAt": "2026-11-13T02:30:08.631Z",
+    "deploymentId": "af88aec0-04a7-4d6b-bcc5-ce179b9d3fe1",
+    "routes": [
+      {
+        "route": "/",
+        "status": 200,
+        "language": "en"
+      },
+      {
+        "route": "/external",
+        "status": 200,
+        "language": "en"
+      },
+      {
+        "route": "/onchain",
+        "status": 200,
+        "language": "en"
+      },
+      {
+        "route": "/randomness",
+        "status": 200,
+        "language": "en"
+      },
+      {
+        "route": "/sponsorship",
+        "status": 200,
+        "language": "en"
+      }
+    ],
+    "pageErrors": [],
+    "updatedBundle": true,
+    "rpcErrorInEnglish": true,
+    "mobileOverflow": false,
+    "health": {
+      "ready": true
+    },
+    "firstPartySourceAndDocumentationFilesAudited": 73,
+    "scope": "Demo copy, progress messages, cancellation, proof errors, wallet guidance and keeper statuses. Browser checks read pages and simulate an RPC failure; no signing or transactions."
   }
 }
