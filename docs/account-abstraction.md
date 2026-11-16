@@ -1,6 +1,6 @@
 # Account abstraction on Chikyū
 
-This branch targets canonical **EntryPoint v0.9**, aligned with DogeOS preinstalls v0.2.2. The [hosted example](https://partner-demos-lab.up.railway.app/aa) remains on v0.7 until the funded testnet rollout described in [entrypoint-09.md](entrypoint-09.md) is completed. The branch fails closed while its manifest still records v0.7.
+The [hosted example](https://partner-demos-lab.up.railway.app/aa) runs canonical **EntryPoint v0.9**, aligned with DogeOS preinstalls v0.2.2. Contracts, backend and web were deployed and verified on Chikyū on 2026-11-16 UTC; see [entrypoint-09.md](entrypoint-09.md) and the [validation receipts](aa-validation.json).
 
 The connected DogeOS SDK wallet owns the smart account. Its address is derived from that owner and **salt `0`** using the pinned factory. The user adds test DOGE to that address and signs an operation that increments a counter. The smart account pays the gas, including account deployment on its first operation and the DogeOS data fee.
 
@@ -10,16 +10,16 @@ The scope is account abstraction with user-paid gas. There is no paymaster, spon
 
 Chain ID: `6281971`. RPC: `https://rpc.testnet.dogeos.com`. The [deployment manifest](../aa/config/chikyu.json) pins addresses and runtime hashes. The browser has a reviewed copy in [deployment.json](../web/app/aa/deployment.json).
 
-The following are the last verified **v0.7 live deployment** addresses. The v0.9 target is `0x433709009B8330FDa32311DF1C2AFA402eD8D009`; the new factory and account implementation are recorded by the deployment script after confirmation.
+The following are the verified **v0.9 live deployment** addresses.
 
 | Contract | Address |
 | --- | --- |
-| EntryPoint v0.7 | `0x799ccb45f55ba51050fec1d2a1b30b65f99c4e81` |
-| SimpleAccountFactory | `0x10f2e1986d392d4f5e63ea8a8d60c8da73f7dd2f` |
-| SimpleAccount implementation | `0x30aACD0f45bc25878b264baf36A83858a2169ba0` |
+| EntryPoint v0.9 | `0x433709009B8330FDa32311DF1C2AFA402eD8D009` |
+| SimpleAccountFactory | `0xc991D3F45eE3dBb2cB270E48195384154C9d40bb` |
+| SimpleAccount implementation | `0xE1D56b7F2eC2DA5fDc0A7C2958C9b2Ff1d0b4b2D` |
 | Counter | `0x935b84fc676958daf32ce333302f3b396bb4b7cb` |
 
-The old EntryPoint has a custom address; the new one uses its canonical CREATE2 address. Configure the chosen EntryPoint and version explicitly in the bundler and SDK. Salt alone does not determine interoperability: the owner, factory and account initialization must also agree. Changing the factory changes the smart-account address and does not move existing assets.
+The old v0.7 deployment is archived in [chikyu-07-retired.json](../aa/config/chikyu-07-retired.json). The new EntryPoint uses its canonical CREATE2 address. Configure the chosen EntryPoint and version explicitly in the bundler and SDK. Salt alone does not determine interoperability: the owner, factory and account initialization must also agree. Changing the factory changes the smart-account address and does not move existing assets.
 
 ## Flow and fees
 
@@ -54,10 +54,27 @@ Start with `npm --prefix aa start`. Set `AA_API_URL=http://127.0.0.1:4341` on th
 
 Railway runs the backend and web separately. The existing private service is still named `partner-sponsorship` for deployment continuity; the web uses `AA_API_URL=http://partner-sponsorship.railway.internal:4341`. It now runs the `aa/` Dockerfile. Keep its existing `/data` volume and one replica. Deploy `web/` with its own Dockerfile. Old paymaster contracts and their funds are not used or withdrawn by this change.
 
+## Operator handoff
+
+Alto is pinned to `0.0.21`, with `entrypoint-simulation-contract-v9` pointing
+to `0xA81301127785225E5A190B3D0adE652a9BE53D26`. Preserve the manifest's
+EntryPoint, version, factory, chain ID and genesis when handing this to Unifra.
+The public Chikyū RPC returned `Method not found` for `debug_traceCall` during
+rollout. This restricted lab therefore uses `safe-mode=false`, one executor,
+private Alto RPC and an API that only allows the counter action.
+
+A general public bundler needs compatible tracing and validation, mempool
+policy, funded executor/nonce management, durable operation recovery, monitoring
+and capacity limits. The DogeOS Galileo compressed data-fee calculation must
+also remain in place so the account covers the network cost. The lab is evidence
+of the integration, not a production availability or security commitment.
+
 ## Verification
 
 The backend tests run a real Anvil chain and Alto process: salt-0 derivation, failure without account funds, account-paid deployment/execution, exact balance/deposit accounting, replay protection, signature and intent checks, real bundling, restart recovery and pending recovery beyond the preview TTL. A pricing regression checks that data-fee reimbursement cannot inflate the bundle tip, including retries.
 
 For the real testnet browser flow, install root dependencies and Chromium, build the web app with a registered client ID and `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=false`, then set `WEB_URL` and `TEST_KEY_FILE` to a private JSON containing a dedicated test owner's `privateKey`, fund that owner's EOA with enough test DOGE for the displayed maximum and its funding transfer, then run `npm run test:browser:aa`. It uses the actual SDK picker with an injected test provider, approves a bounded funding transfer and signs one UserOperation. Signing stays in the Node test runner. It verifies account payment of the full network fee, zero paymaster, reload recovery and the shared SDK connection. For testing against the published backend, a local web build can proxy to `AA_API_URL=https://partner-demos-lab.up.railway.app/api/aa`. The public deployment uses Google/X login; this browser test does not complete OAuth or exercise a human wallet extension.
 
-Historical results for the previous sponsored implementation remain in `docs/validation.json`. `docs/aa-validation.json` records the hosted self-paid **v0.7** run, not a v0.9 network proof. The v0.9 local tests and pending rollout are documented in `docs/entrypoint-09.md`.
+`docs/aa-validation.json` records the **v0.9** network and browser proof.
+The earlier self-paid v0.7 proof remains in `docs/aa-07-validation.json`;
+historical sponsored results remain in `docs/validation.json`.

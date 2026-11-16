@@ -11,8 +11,16 @@ let keys = await readFile(process.env.TEST_KEY_FILE, 'utf8').then(JSON.parse).ca
 if (!keys) { keys = { privateKey: generatePrivateKey() }; await writeFile(process.env.TEST_KEY_FILE, JSON.stringify(keys), { mode: 0o600 }); }
 const owner = privateKeyToAccount(keys.privateKey);
 const manifest = JSON.parse(await readFile(new URL('../aa/config/chikyu.json', import.meta.url), 'utf8'));
+assert.equal(manifest.entryPointVersion, '0.9', 'Deploy the verified v0.9 manifest first.');
 const { chain } = await import('../aa/lib/chain.mjs');
 const rpc = createPublicClient({ chain, transport: http(manifest.rpcUrl) });
+assert.equal(await rpc.getChainId(), manifest.chainId);
+assert.equal((await rpc.getBlock({ blockNumber: 0n })).hash, manifest.genesisHash);
+const config = await fetch(base + '/api/aa/config').then(async response => { assert(response.ok); return response.json(); });
+assert.equal(config.entryPointVersion, '0.9');
+assert.equal(config.entryPoint.toLowerCase(), manifest.entryPoint.toLowerCase());
+assert.equal(config.accountFactory.toLowerCase(), manifest.accountFactory.toLowerCase());
+assert.equal(config.accountSalt, '0'); assert.equal(config.funding, 'account');
 const wallet = createWalletClient({ account: owner, chain, transport: http(manifest.rpcUrl) });
 const account = await rpc.readContract({ address: manifest.accountFactory,
   abi: parseAbi(['function getAddress(address,uint256) view returns (address)']), functionName: 'getAddress', args: [owner.address, 0n] });
@@ -70,6 +78,7 @@ await page.addInitScript(() => {
   const detail = { info: { uuid: 'd3184cf1-bf4d-4f08-898e-bebdd81cdad1', name: 'MetaMask', icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>', rdns: 'io.metamask' }, provider };
   window.addEventListener('eip6963:requestProvider', () => window.dispatchEvent(new CustomEvent('eip6963:announceProvider', { detail })));
 });
+try {
 await page.goto(`${base}/aa`);
 async function connectSdk() {
   await page.getByRole('button', { name: 'Connect Wallet', exact: true }).first().click();
@@ -131,4 +140,5 @@ await mkdir('test/results', { recursive: true });
 await writeFile('test/results/browser-aa.json', JSON.stringify({ base, owner: owner.address, account, salt: 0, count, transactionUrl, errors,
   userChargeWei: String(event.args.actualGasCost), networkFeeWei: String(networkFee), l1FeeWei: String(BigInt(raw.l1Fee)), fundedWei: String(funded), accountBeforeWei: String(accountBefore),
   entryPointVersion: '0.9', typedDataSignCount: methods.filter(m => m === 'eth_signTypedData_v4').length, ownerTransactionRequests: methods.filter(m => ['eth_sendTransaction','eth_signTransaction','eth_sendRawTransaction'].includes(m)), reloadRecovered: true, reconnectedAfterReload, sharedSdkConnection: true, fundingCancellationRecovered: true, signatureCancellationRecovered: true }, null, 2));
-await browser.close(); assert.equal(errors.length, 0, errors.join('\n')); console.log(`PASS: SDK wallet → funded smart account → self-paid counter ${count} → reload recovery; ${transactionUrl}`);
+assert.equal(errors.length, 0, errors.join('\n')); console.log(`PASS: SDK wallet → funded smart account → self-paid counter ${count} → reload recovery; ${transactionUrl}`);
+} finally { await browser.close(); }
