@@ -1,0 +1,18 @@
+{
+  "network": "isolated Anvil, not devnet",
+  "chainId": 31337,
+  "genesisHash": "0x7a10b97c76255bdc6fc17415426dfee1ed877f898cb519645bb58f7197247608",
+  "address": "0x6763f6E30C28c151F6e655C0776957a41D182bE2",
+  "delegate": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+  "entryPoint": "0x433709009B8330FDa32311DF1C2AFA402eD8D009",
+  "activationTransaction": "0x9809cc582a9681d76144925754d5c80f8ed14dc6c623cb4fffba8a3abd056983",
+  "counterTransaction": "0xb95b17fbecba14057c7ce3bd103b786f48e74fc6fd994861476be9df69aeba8f",
+  "userOpHash": "0x5e8b1a1e67cb7fe1f76b9f14ade564869458b3cee3beb202adcdc4382507b17f",
+  "counter": "1",
+  "userChargeDoge": "0.00000000004110267",
+  "paymaster": "0x0000000000000000000000000000000000000000",
+  "previewCancellation": "passed",
+  "activationReload": "passed",
+  "operationReload": "passed",
+  "pageErrors": []
+}

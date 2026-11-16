@@ -11,6 +11,7 @@ const vendor = resolve(root, 'vendor/account-abstraction');
 const provenance = JSON.parse(readFileSync(resolve(vendor, 'SOURCE.json'), 'utf8'));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const sources = {};
+sources['Counter.sol'] = { content: readFileSync(resolve(root, 'contracts/Counter.sol'), 'utf8') };
 for (const [path, expected] of Object.entries(provenance.files)) {
   const bytes = readFileSync(resolve(vendor, path));
   assert.equal(sha256(bytes), expected, `Upstream source changed: ${path}`);
@@ -27,8 +28,8 @@ const errors = output.errors?.filter(error => error.severity === 'error') ?? [];
 assert.equal(errors.length, 0, errors.map(error => error.formattedMessage).join('\n'));
 const destination = resolve(root, 'artifacts');
 mkdirSync(destination, { recursive: true });
-for (const name of ['SimpleAccount', 'SimpleAccountFactory', 'Simple7702Account']) {
-  const compiled = output.contracts[`accounts/${name}.sol`][name];
+for (const name of ['SimpleAccount', 'SimpleAccountFactory', 'Simple7702Account', 'Counter']) {
+  const compiled = output.contracts[name === 'Counter' ? 'Counter.sol' : `accounts/${name}.sol`][name];
   writeFileSync(resolve(destination, `${name}.json`), JSON.stringify({ contractName: name,
     abi: compiled.abi, bytecode: `0x${compiled.evm.bytecode.object}`,
     deployedBytecode: `0x${compiled.evm.deployedBytecode.object}`, upstreamCommit: provenance.commit }));

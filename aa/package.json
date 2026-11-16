@@ -10,6 +10,8 @@
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "start": "node server.mjs",
     "build:contracts": "node scripts/build-contracts.mjs",
+    "demo:local": "node test/fixture-server.mjs",
+    "deploy:devnet": "node scripts/deploy-devnet.mjs",
     "postinstall": "node scripts/build-contracts.mjs && node scripts/patch-alto.mjs"
   },
   "dependencies": {

@@ -4,7 +4,9 @@ Integrate DogeOS quests using onchain smart contract events or actions verified 
 
 **Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Account Abstraction. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`.
 
-This branch implements ERC-4337 with canonical EntryPoint v0.9 and a SimpleAccount derived with salt `0`. The user funds that account with DOGE and it pays for its operations, including the DogeOS data fee. The hosted demo remains on v0.7 until the [v0.9 contract rollout](docs/entrypoint-09.md) is funded and verified. See [AA setup and provider handoff](docs/account-abstraction.md) for contracts, APIs, costs and limits. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
+**This branch is the separate [EIP-7702 devnet lab](docs/aa-7702.md).** Its two actions activate the EOA's delegation and increment the counter through ERC-4337 v0.9. Both are paid by the account in DOGE. The browser currently uses a disposable lab account because the published SDK does not expose authorization signing. Local browser and Alto tests pass; devnet deployment is pending funding. This branch has not replaced the hosted demo.
+
+The base branch `feat/partner-aa-self-paid` implements the SDK-owned SimpleAccount with salt 0; its [v0.9 rollout](docs/entrypoint-09.md) is also awaiting testnet funds. See [base AA setup](docs/account-abstraction.md). The remaining older examples below belong to that base application.
 
 The hosted demo offers Google and X sign-in through its own registered DogeOS client, matching Questing, and connects the EVM wallet for all four routes. DogeOS manages the OAuth providers; no Google or X credentials belong in this app.
 

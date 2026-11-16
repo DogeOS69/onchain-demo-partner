@@ -3,7 +3,7 @@
 .env*.local
 
 # Node / Next
-**/node_modules/
+**/node_modules
 web/.next/
 web/out/
 

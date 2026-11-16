@@ -10,3 +10,5 @@ export const entryPointCodeHashes = {
   6281971: '0x723352984e0761e22ca9ae376a4c0fc95dc291c10a38bafd66201daf084f378d',
   1122005: '0x32adf07a173d5ea9dd600f94c2e8e725b0b584b48133746ff24b475e20fb174e',
 };
+export const delegateCodeHash = '0x3b1d0694cb8bf1d50d33d679486a47499227b5e2434ee48fe5c9a3b0dc0ca9de';
+export const counterCodeHash = '0x3ff8cfc73f069a8ec58a1c7f3059993dcbd3cc8dfebeb0a4b0ddb2241320da0a';

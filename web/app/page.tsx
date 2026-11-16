@@ -1,3 +1,2 @@
-import Link from "next/link";
-const demos = [["external", "External rule", "Complete a partner action and verify a quest."], ["onchain", "Onchain rule", "Emit a contract event and verify a quest."], ["randomness", "Randomness", "Roll a die using a verified drand round."], ["aa", "Account abstraction", "Use a smart account to increment a counter and pay gas in DOGE."]];
-export default function Page() { return <><h1>Demos</h1><div className="demo-list">{demos.map(([path,title,description]) => <Link className="demo-link" href={`/${path}`} key={path}><h2>{title}<span aria-hidden="true">↗</span></h2><p>{description}</p></Link>)}</div></>; }
+import { redirect } from 'next/navigation';
+export default function Page() { redirect('/aa'); }
