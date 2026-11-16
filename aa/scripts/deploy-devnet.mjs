@@ -71,7 +71,7 @@ async function send(name, { data, to, value = 0n, gas, expectedHash, bytecode })
 async function deploy(name, contract, args = [], expectedHash) {
   const bytecode = typeof contract.bytecode === 'string' ? contract.bytecode : contract.bytecode.object;
   return send(name, { data: encodeDeployData({ abi: contract.abi, bytecode, args }), bytecode,
-    gas: name === 'EntryPointSimulations09' ? 7_000_000n : 3_000_000n, expectedHash });
+    gas: ['EntryPointSimulations09', 'PimlicoSimulations'].includes(name) ? 7_000_000n : 3_000_000n, expectedHash });
 }
 const load = async path => JSON.parse(await readFile(resolve(root, 'node_modules/@pimlico/alto/esm/contracts', path), 'utf8'));
 const delegate = await deploy('Simple7702Account', await artifact('Simple7702Account'), [canonicalEntryPoint], delegateCodeHash);

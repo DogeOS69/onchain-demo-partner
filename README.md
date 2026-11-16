@@ -4,7 +4,7 @@ Integrate DogeOS quests using onchain smart contract events or actions verified 
 
 **Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Account Abstraction. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`.
 
-**This branch is the separate [EIP-7702 devnet lab](docs/aa-7702.md).** Its two actions activate the EOA's delegation and increment the counter through ERC-4337 v0.9. Both are paid by the account in DOGE. The browser currently uses a disposable lab account because the published SDK does not expose authorization signing. Local browser and Alto tests pass; devnet deployment is pending funding. This branch has not replaced the hosted demo.
+**This branch is the separate [EIP-7702 devnet lab](docs/aa-7702.md), [live here](https://partner-7702-demo-lab.up.railway.app/aa).** Its two actions activate the EOA's delegation and increment the counter through ERC-4337 v0.9. Both are paid by the account in DOGE. The browser uses a disposable lab account because the published SDK does not expose authorization signing. Real devnet activation and counter transactions passed browser validation with 18 confirmations, zero paymaster and reload recovery; see the [receipts](docs/aa-7702-devnet-validation.json). This runs in separate services from the hosted testnet demo.
 
 The base branch `feat/partner-aa-self-paid` implements the SDK-owned SimpleAccount with salt 0; its [v0.9 rollout](docs/entrypoint-09.md) is also awaiting testnet funds. See [base AA setup](docs/account-abstraction.md). The remaining older examples below belong to that base application.
 

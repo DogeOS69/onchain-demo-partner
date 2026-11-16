@@ -6,6 +6,7 @@
     "test:browser": "node test/browser.mjs",
     "test:browser:aa": "node test/browser-aa.mjs",
     "test:browser:7702": "node test/browser-7702.mjs",
+    "test:browser:7702:devnet": "node test/browser-7702-devnet.mjs",
     "test:browser:chain": "node test/browser-chain.mjs",
     "test:browser:network": "node test/browser-network.mjs"
   },
