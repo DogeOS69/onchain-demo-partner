@@ -71,7 +71,9 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
   }
 
   async function reserveFor(op) {
-    const dataFee = (await dataFeeFor(op)) * 125n / 100n;
+    // Preparation adds 25% headroom; submission may consume that headroom
+    // when fees rise instead of demanding a fresh 25% margin every time.
+    const dataFee = await dataFeeFor(op);
     const price = BigInt(op.maxFeePerGas);
     if (BigInt(op.preVerificationGas) * price < dataFee + 100_000n * price)
       throw new ApiError(409, 'The network fee changed. Prepare again before signing.');
