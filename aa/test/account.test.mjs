@@ -13,6 +13,7 @@ import { accountAbi, accountSalt, artifact, counterAbi, factoryAbi } from '../li
 import { checkIntent, factoryCall, incrementCall, limits, maxCost, operationHash, operationTypedData, packOperation, verifyOwner } from '../lib/user-operation.mjs';
 import { launchAlto } from '../lib/alto.mjs';
 import { createEngine } from '../lib/engine.mjs';
+import { activationQuote } from '../lib/activation.mjs';
 import { arachnid, arachnidRuntime, canonicalEntryPoint, entryPointCodeHashes, entryPointSalt } from '../lib/deployment.mjs';
 
 let anvil, client, wallet, admin, entry, factory, manifest, counter, localRpc;
@@ -56,6 +57,74 @@ before(async () => {
   const implementation = await client.readContract({ address: fac, abi: factory.abi, functionName: 'accountImplementation' });
   manifest = { chainId: 31337, entryPointVersion: '0.9', entryPoint: ep, accountFactory: fac, counter, accountImplementation: implementation };
 
+});
+
+test('7702 preserves the EOA and pays for activation and a real Alto counter operation', { timeout: 45_000 }, async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'partner-7702-test-'));
+  let bundler;
+  try {
+    const deploy = async contract => {
+      const bytecode = typeof contract.bytecode === 'string' ? contract.bytecode : contract.bytecode.object;
+      const hash = await wallet.deployContract({ abi: contract.abi, bytecode, args: contract.args ?? [], ...testFees });
+      return (await client.waitForTransactionReceipt({ hash })).contractAddress;
+    };
+    const delegate = await deploy({ ...await artifact('Simple7702Account'), args: [manifest.entryPoint] });
+    const { readFile } = await import('node:fs/promises');
+    const pimlicoSimulations = await deploy(JSON.parse(await readFile(new URL('../node_modules/@pimlico/alto/esm/contracts/PimlicoSimulations.sol/PimlicoSimulations.json', import.meta.url), 'utf8')));
+    const entryPointSimulations = await deploy(JSON.parse(await readFile(new URL('../node_modules/@pimlico/alto/esm/contracts/EntryPointSimulations.sol/EntryPointSimulations09.json', import.meta.url), 'utf8')));
+    const local = { ...manifest, accountMode: 'eip7702', delegate, rpcUrl: localRpc,
+      pimlicoSimulations, entryPointSimulations,
+      contracts: { Simple7702Account: { address: delegate, runtimeCodeHash: keccak256(await client.getCode({ address: delegate })) } } };
+    delete local.accountFactory;
+    const listener = createServer();
+    await new Promise(resolve => listener.listen(0, '127.0.0.1', resolve));
+    const port = listener.address().port; await new Promise(resolve => listener.close(resolve));
+    bundler = await launchAlto({ manifest: local, executorPrivateKey: admin.privateKey ?? '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80', stateDir: dir, port });
+    const engine = await createEngine({ manifest: local, executor: admin.address, rpc: bundler.rpc, stateDir: dir, client, requiredConfirmations: 1 });
+    const eoa = privateKeyToAccount(generatePrivateKey());
+    const userWallet = createWalletClient({ account: eoa, chain, transport: http(localRpc) });
+    await assert.rejects(engine.prepare(eoa.address), /Activate/);
+    await fund(eoa.address);
+    const quote = await activationQuote(eoa.address, local, client);
+    assert.equal(quote.authorizationNonce, quote.nonce + 1, 'self-executed authorization sees the incremented transaction nonce');
+    const auth = await eoa.signAuthorization({ address: delegate, chainId: chain.id, nonce: quote.authorizationNonce });
+    const activation = await userWallet.sendTransaction({ to: eoa.address, data: '0x', value: 0n,
+      authorizationList: [auth], nonce: quote.nonce, gas: BigInt(quote.gas), ...testFees });
+    const receipt = await client.waitForTransactionReceipt({ hash: activation });
+    assert.equal(receipt.status, 'success'); assert.equal(receipt.type, 'eip7702');
+    assert.equal((await client.getCode({ address: eoa.address })).toLowerCase(), ('0xef0100' + delegate.slice(2)).toLowerCase());
+    await assert.rejects(activationQuote(eoa.address, local, client), /already activated/);
+    await assert.rejects(client.simulateContract({ account: admin, address: eoa.address, abi: accountAbi,
+      functionName: 'execute', args: [counter, 0n, encodeFunctionData({ abi: counterAbi, functionName: 'increment' })] }));
+    const before = await available(eoa.address);
+    const prepared = await engine.prepare(eoa.address);
+    assert.equal(prepared.account, eoa.address); assert.equal(prepared.userOperation.factory, undefined);
+    assert.equal(prepared.userOperation.paymaster, undefined); assert.equal(prepared.userOperation.eip7702Auth, undefined);
+    assert.throws(() => checkIntent({ ...prepared.userOperation, factory: delegate }, eoa.address, local));
+    const signature = await eoa.signTypedData(operationTypedData(prepared.userOperation, local));
+    await assert.rejects(engine.submit(prepared.id, await owner.signTypedData(operationTypedData(prepared.userOperation, local))));
+    await engine.submit(prepared.id, signature);
+    for (let i = 0; i < 100; i++) {
+      await engine.tick();
+      if (engine.status(prepared.id).status === 'confirmed') break;
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+    const confirmed = engine.status(prepared.id);
+    assert.equal(confirmed.status, 'confirmed'); assert.equal(confirmed.counterAfter, '1');
+    assert.equal(before - await available(eoa.address), parseEther(confirmed.userChargeDoge));
+    assert.equal(confirmed.feeCovered, true);
+    const restored = await createEngine({ manifest: local, executor: admin.address, rpc: bundler.rpc, stateDir: dir, client, requiredConfirmations: 1 });
+    assert.equal((await restored.submit(prepared.id, signature)).transactionHash, confirmed.transactionHash);
+    const next = await restored.prepare(eoa.address);
+    const revoke = await userWallet.signAuthorization({ contractAddress: zeroAddress, executor: 'self' });
+    const revokeHash = await userWallet.sendTransaction({ to: eoa.address, authorizationList: [revoke], gas: 100_000n, ...testFees });
+    await client.waitForTransactionReceipt({ hash: revokeHash });
+    assert.equal((await client.getCode({ address: eoa.address })) ?? '0x', '0x');
+    await assert.rejects(restored.submit(next.id, await eoa.signTypedData(operationTypedData(next.userOperation, local))), /Activate/);
+  } finally {
+    if (bundler) { bundler.child.kill('SIGTERM'); await new Promise(resolve => bundler.child.once('exit', resolve)); }
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 after(() => { anvil?.kill('SIGTERM'); });
@@ -138,6 +207,22 @@ test('the final v0.9 factory prevents direct account-creation front-running', as
   const fresh = privateKeyToAccount(generatePrivateKey());
   await assert.rejects(client.simulateContract({ account: admin, address: manifest.accountFactory,
     abi: factory.abi, functionName: 'createAccount', args: [fresh.address, 0n] }));
+});
+
+test('a reverted type-4 call can leave 7702 delegation active', async () => {
+  const contract = await artifact('Simple7702Account');
+  const hash = await wallet.deployContract({ abi: contract.abi, bytecode: contract.bytecode, args: [manifest.entryPoint], ...testFees });
+  const delegate = (await client.waitForTransactionReceipt({ hash })).contractAddress;
+  const eoa = privateKeyToAccount(generatePrivateKey());
+  await fund(eoa.address);
+  const user = createWalletClient({ account: eoa, chain, transport: http(localRpc) });
+  const authorization = await user.signAuthorization({ contractAddress: delegate, executor: 'self' });
+  // The EOA lacks the requested transfer amount, so execution reverts after delegation.
+  const tx = await user.sendTransaction({ to: eoa.address, gas: 150_000n, authorizationList: [authorization],
+    data: encodeFunctionData({ abi: accountAbi, functionName: 'execute', args: [admin.address, parseEther('1'), '0x'] }), ...testFees });
+  const receipt = await client.waitForTransactionReceipt({ hash: tx });
+  assert.equal(receipt.type, 'eip7702'); assert.equal(receipt.status, 'reverted');
+  assert.equal((await client.getCode({ address: eoa.address })).toLowerCase(), ('0xef0100' + delegate.slice(2)).toLowerCase());
 });
 
 test('Alto estimates and includes a real self-funded UserOperation; recovery does not send twice', { timeout: 45_000 }, async () => {

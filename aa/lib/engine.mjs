@@ -14,7 +14,7 @@ const implementationSlot = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920
 const activeStates = ['submitted', 'included'];
 
 export async function createEngine({ manifest, executor, rpc, stateDir,
-  client = reader(), requiredConfirmations = 18 }) {
+  client = reader(manifest), requiredConfirmations = 18 }) {
   await assertNetwork(client, manifest);
   assert.equal(manifest.entryPointVersion, '0.9', 'EntryPoint v0.9 is required');
   const entry = await artifact('EntryPoint');
@@ -22,11 +22,13 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
     assert.equal(keccak256(await client.getCode({ address: contract.address })), contract.runtimeCodeHash,
       'A configured contract has different code');
   }
-  const path = resolve(stateDir, 'aa-operations-09.private.json');
+  const delegated = manifest.accountMode === 'eip7702';
+  const path = resolve(stateDir, delegated ? 'aa-7702-operations.private.json' : 'aa-operations-09.private.json');
   const db = await readJson(path, { version: 1, chainId: manifest.chainId, entryPoint: manifest.entryPoint,
-    accountFactory: manifest.accountFactory, accountSalt: String(accountSalt), operations: {} });
+    genesisHash: manifest.genesisHash, accountFactory: manifest.accountFactory, delegate: manifest.delegate, accountSalt: String(accountSalt), operations: {} });
   assert(db.chainId === manifest.chainId && same(db.entryPoint, manifest.entryPoint)
-    && same(db.accountFactory, manifest.accountFactory) && db.accountSalt === String(accountSalt), 'State belongs to another deployment');
+    && (delegated ? same(db.delegate, manifest.delegate) : same(db.accountFactory, manifest.accountFactory))
+    && db.genesisHash === manifest.genesisHash && db.accountSalt === String(accountSalt), 'State belongs to another deployment');
   let writes = Promise.resolve();
   const checkpoint = () => {
     const snapshot = JSON.parse(json(db));
@@ -46,6 +48,13 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
 
   async function checkAccount(owner, address) {
     const code = await client.getCode({ address });
+    if (delegated) {
+      if (!same(address, owner) || !same(code, '0xef0100' + manifest.delegate.slice(2)))
+        throw new ApiError(409, 'Activate this demo’s EIP-7702 delegation first.');
+      const ep = await client.readContract({ address, abi: accountAbi, functionName: 'entryPoint' });
+      if (!same(ep, manifest.entryPoint)) throw new ApiError(409, 'The delegate uses a different EntryPoint.');
+      return true;
+    }
     if (!code || code === '0x') return false;
     const [storedOwner, ep, implementation] = await Promise.all([
       client.readContract({ address, abi: accountAbi, functionName: 'owner' }),
@@ -81,7 +90,7 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
     return (executionGas(op) + 100_000n) * price + dataFee;
   }
   async function config() {
-    return { chainId: manifest.chainId, chainName: 'DogeOS Chikyu', rpcUrl: manifest.rpcUrl,
+    return { ...manifest, chainId: manifest.chainId, chainName: manifest.chainName ?? 'DogeOS Chikyu', rpcUrl: manifest.rpcUrl,
       explorerUrl: manifest.explorerUrl, entryPoint: manifest.entryPoint, entryPointVersion: '0.9',
       accountFactory: manifest.accountFactory, accountSalt: String(accountSalt), counter: manifest.counter,
       executor, operationsEnabled: await client.getBalance({ address: executor }) >= limits.maxCost,
@@ -101,8 +110,8 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
       if (!(await config()).operationsEnabled) throw new ApiError(503, 'The bundler is temporarily unavailable.');
       if (Object.keys(db.operations).length >= limits.maxPreparations) throw new ApiError(429, 'The demo preparation limit has been reached.');
       const ownerCode = await client.getCode({ address: owner });
-      if (ownerCode && ownerCode !== '0x') throw new ApiError(400, 'Connect an EOA wallet for this demo.');
-      const account = getAddress(await client.readContract({ address: manifest.accountFactory, abi: factoryAbi,
+      if (!delegated && ownerCode && ownerCode !== '0x') throw new ApiError(400, 'Connect an EOA wallet for this demo.');
+      const account = delegated ? owner : getAddress(await client.readContract({ address: manifest.accountFactory, abi: factoryAbi,
         functionName: 'getAddress', args: [owner, accountSalt] }));
       const deployed = await checkAccount(owner, account);
       const [nonce, count, prices] = await Promise.all([nonceOf(account), countOf(account), rpc('pimlico_getUserOperationGasPrice')]);

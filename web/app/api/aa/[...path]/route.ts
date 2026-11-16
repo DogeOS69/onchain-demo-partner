@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 async function handle(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const route = path.join('/');
-  const allowed = request.method === 'GET' ? /^(config|operations\/[0-9a-f-]{36})$/ : /^(prepare|submit)$/;
+  const allowed = request.method === 'GET' ? /^(config|operations\/[0-9a-f-]{36})$/ : /^(prepare|submit|activation\/quote)$/;
   if (!allowed.test(route)) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
   const origin = request.headers.get('origin');
   if (request.method === 'POST' && origin && origin !== request.nextUrl.origin && origin !== process.env.WEB_ORIGIN)

@@ -3,6 +3,7 @@ WORKDIR /app
 COPY --chown=node:node package.json package-lock.json ./
 COPY --chown=node:node scripts ./scripts
 COPY --chown=node:node vendor ./vendor
+COPY --chown=node:node contracts ./contracts
 RUN npm ci --omit=dev --no-audit --no-fund
 COPY --chown=node:node lib ./lib
 COPY --chown=node:node config ./config

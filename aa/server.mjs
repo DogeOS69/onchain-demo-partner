@@ -4,12 +4,17 @@ import { resolve } from 'node:path';
 import { privateKeyToAccount } from 'viem/accounts';
 import { launchAlto } from './lib/alto.mjs';
 import { createEngine } from './lib/engine.mjs';
-import { chainId, json, readJson, root, rpcUrl, safeError } from './lib/chain.mjs';
+import { json, readJson, root, safeError } from './lib/chain.mjs';
+import { activationQuote } from './lib/activation.mjs';
 import { ApiError } from './lib/user-operation.mjs';
 
-const manifest = await readJson(resolve(root, 'config/chikyu.json'));
+const manifest = await readJson(process.env.AA_MANIFEST_FILE ?? resolve(root, 'config/devnet.json'));
+const chainId = manifest.chainId;
 assert.equal(manifest.entryPointVersion, '0.9', 'Run the v0.9 deployment script before starting this backend');
-assert(manifest.chainId === chainId && manifest.rpcUrl === rpcUrl, 'This server only serves Chikyu');
+assert.equal(manifest.accountMode, 'eip7702');
+assert(manifest.chainId === 6281971 && manifest.genesisHash === '0x4d6ef3d0349760195375877b4b3d9c0a5107c6df559e075b67e95d48962be868'
+  && manifest.rpcUrl === 'https://rpc.devnet.doge.xyz', 'This server only serves DogeOS devnet');
+assert.equal(manifest.deploymentStatus, 'verified', 'Devnet deployment is pending');
 const stateDir = resolve(process.env.AA_STATE_DIR ?? resolve(root, '.runtime'));
 const keys = process.env.BUNDLER_EXECUTOR_PRIVATE_KEY ? {
   executorPrivateKey: process.env.BUNDLER_EXECUTOR_PRIVATE_KEY,
@@ -60,6 +65,7 @@ const server = createServer(async (request, response) => {
       if (request.headers.origin && request.headers.origin !== webOrigin) throw new ApiError(403, 'Origin is not allowed.');
       limitWrites(request);
       const input = await body(request);
+      if (path === '/activation/quote') return respond(request, response, 200, await activationQuote(input.owner, manifest));
       if (path === '/prepare') return respond(request, response, 200, await engine.prepare(input.owner));
       if (path === '/submit') {
         if (typeof input.id !== 'string' || !/^[0-9a-f-]{36}$/.test(input.id)) throw new ApiError(400, 'Invalid operation ID.');
@@ -89,7 +95,7 @@ try {
   ready = true;
   timer = setInterval(() => void engine.tick().catch(error => console.error(safeError(error))), 4000);
   void engine.tick();
-  console.log('Self-funded counter ready on Chikyu.');
+  console.log('Self-funded 7702 counter ready on DogeOS devnet.');
 } catch (error) {
   console.error(`Startup failed: ${safeError(error)}`);
   alto?.child.kill('SIGTERM'); server.close(() => process.exit(1));

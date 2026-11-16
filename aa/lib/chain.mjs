@@ -29,7 +29,10 @@ export const factoryAbi = parseAbi([
 export const oracleAbi = parseAbi(['function getL1Fee(bytes data) view returns (uint256)', 'function isGalileo() view returns (bool)']);
 export const json = (value) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2);
 export const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.toLowerCase() === b.toLowerCase();
-export const reader = () => createPublicClient({ chain, transport: http(rpcUrl, { retryCount: 1, timeout: 20_000 }) });
+export const reader = (manifest) => createPublicClient({ chain: manifest ? { ...chain,
+  id: manifest.chainId, name: manifest.chainName ?? chain.name,
+  rpcUrls: { default: { http: [manifest.rpcUrl] } } } : chain,
+  transport: http(manifest?.rpcUrl ?? rpcUrl, { retryCount: 1, timeout: 20_000 }) });
 export async function assertNetwork(client, manifest) {
   if (await client.getChainId() !== manifest.chainId) throw new Error('Wrong chain');
   if (manifest.chainId === 31337 && !manifest.genesisHash) return;

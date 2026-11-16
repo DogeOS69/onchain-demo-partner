@@ -53,6 +53,8 @@ export function operationHash(op, manifest) {
 }
 export function checkIntent(op, owner, manifest) {
   requireSelfPayment(op);
+  if (manifest.accountMode === 'eip7702' && (!same(op.sender, owner) || op.factory || op.factoryData))
+    throw new ApiError(400, '7702 uses the existing EOA without a factory.');
   if (op.callData !== incrementCall(manifest.counter)) throw new ApiError(400, 'The counter action changed.');
   if (op.factory ? !same(op.factory, manifest.accountFactory) || op.factoryData !== factoryCall(owner) : !!op.factoryData)
     throw new ApiError(400, 'The smart-account owner or factory changed.');
