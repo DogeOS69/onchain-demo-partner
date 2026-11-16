@@ -1,14 +1,14 @@
 {
-  "name": "dogeos-sponsored-counter",
+  "name": "dogeos-aa-counter",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22.13" },
+  "engines": {
+    "node": ">=22.13"
+  },
   "scripts": {
-    "compile": "node scripts/compile.mjs",
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "start": "node server.mjs",
-    "deploy:contracts": "node scripts/deploy.mjs",
     "postinstall": "node scripts/patch-alto.mjs"
   },
   "dependencies": {

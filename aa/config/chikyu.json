@@ -37,7 +37,18 @@
       "creationDataHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
       "runtimeCodeHash": "0x22dbcbfa136fcf31bd56a73a11492356bbfac658009dc867cfb0a61485bd7b37",
       "transactionHash": "0x0997d29a4434bd4112b8d29bdb618ef3928e0ac0fafa7e672a333cb4d2a51e11"
+    },
+    "SimpleAccount": {
+      "address": "0x30aACD0f45bc25878b264baf36A83858a2169ba0",
+      "runtimeCodeHash": "0x35ed583f36f299d5136dc68a2b3f18bab3959a3238cd1471acc2b4e3dc668094"
+    },
+    "Counter": {
+      "address": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+      "runtimeCodeHash": "0x272e78b3a78a47832b2e52f4d63e931a762e58cb43cb5be39e25004e9e10d450"
     }
   },
-  "accountSalt": "20261112"
+  "accountSalt": "0",
+  "executor": "0x0FDd7B8DDE2A4634B3328AE0Db2f375688A101aF",
+  "deployer": "0x6841daCCc954413b96641Ef55783367a140c2E8a",
+  "deploymentBlock": "9418919"
 }

@@ -7,7 +7,7 @@ const demos = [
   ["/external", "External rule"],
   ["/onchain", "Onchain rule"],
   ["/randomness", "Randomness"],
-  ["/sponsorship", "Gas sponsorship"],
+  ["/aa", "Account abstraction"],
 ];
 
 export function DemoNav() {

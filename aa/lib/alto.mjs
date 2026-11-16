@@ -28,6 +28,8 @@ export async function launchAlto({ manifest, executorPrivateKey, stateDir, port 
     'pimlico-simulation-contract': manifest.pimlicoSimulations,
     'entrypoint-simulation-contract-v7': manifest.entryPointSimulations,
     'safe-mode': false, 'eip-7702-support': false, 'enable-debug-endpoints': false,
+    // Use the network gas price; data-fee reimbursement must not inflate the L2 tip.
+    'skip-local-gas-calculations': true,
     'chain-type': 'default', 'chain-native-decimals': 18, 'supports-eip7623': false,
     'max-gas-per-user-op': '1500000', 'max-executors': 1,
     'simulation-call-gas-limit': '200000', 'simulation-verification-gas-limit': '500000',

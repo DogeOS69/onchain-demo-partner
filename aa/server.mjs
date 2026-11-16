@@ -9,11 +9,10 @@ import { ApiError } from './lib/user-operation.mjs';
 
 const manifest = await readJson(resolve(root, 'config/chikyu.json'));
 assert(manifest.chainId === chainId && manifest.rpcUrl === rpcUrl, 'This server only serves Chikyu');
-const stateDir = resolve(process.env.SPONSOR_STATE_DIR ?? resolve(root, '.runtime'));
-const keys = process.env.SPONSOR_QUOTE_PRIVATE_KEY ? {
-  quotePrivateKey: process.env.SPONSOR_QUOTE_PRIVATE_KEY,
+const stateDir = resolve(process.env.AA_STATE_DIR ?? resolve(root, '.runtime'));
+const keys = process.env.BUNDLER_EXECUTOR_PRIVATE_KEY ? {
   executorPrivateKey: process.env.BUNDLER_EXECUTOR_PRIVATE_KEY,
-} : await readJson(process.env.SPONSOR_KEY_FILE ?? resolve(root, '.runtime/keys.json'));
+} : await readJson(process.env.AA_KEY_FILE ?? resolve(root, '.runtime/keys.json'));
 const executor = privateKeyToAccount(keys.executorPrivateKey).address;
 assert(executor.toLowerCase() === manifest.executor.toLowerCase(), 'Wrong bundler executor');
 const webOrigin = process.env.WEB_ORIGIN ? new URL(process.env.WEB_ORIGIN).origin : undefined;
@@ -54,7 +53,7 @@ const server = createServer(async (request, response) => {
       return response.end();
     }
     if (request.method === 'GET' && path === '/health') return respond(request, response, ready ? 200 : 503, { ready, chainId });
-    if (!ready) throw new ApiError(503, 'Sponsorship is starting. Try again shortly.');
+    if (!ready) throw new ApiError(503, 'Account abstraction is starting. Try again shortly.');
     if (request.method === 'GET' && path === '/config') return respond(request, response, 200, await engine.config());
     if (request.method === 'POST') {
       if (request.headers.origin && request.headers.origin !== webOrigin) throw new ApiError(403, 'Origin is not allowed.');
@@ -73,7 +72,7 @@ const server = createServer(async (request, response) => {
     const expected = error instanceof ApiError;
     if (!expected) console.error(safeError(error));
     respond(request, response, expected ? error.status : 503,
-      { error: expected ? error.message : 'Sponsorship is temporarily unavailable. Try again shortly.' });
+      { error: expected ? error.message : 'Account abstraction is temporarily unavailable. Try again shortly.' });
   }
 });
 server.requestTimeout = 60_000; server.headersTimeout = 15_000;
@@ -85,11 +84,11 @@ for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
 try {
   alto = await launchAlto({ manifest, executorPrivateKey: keys.executorPrivateKey, stateDir });
   alto.child.on('exit', () => { ready = false; server.close(() => process.exit(1)); });
-  engine = await createEngine({ manifest, quotePrivateKey: keys.quotePrivateKey, executor, rpc: alto.rpc, stateDir });
+  engine = await createEngine({ manifest, executor, rpc: alto.rpc, stateDir });
   ready = true;
   timer = setInterval(() => void engine.tick().catch(error => console.error(safeError(error))), 4000);
   void engine.tick();
-  console.log('Sponsored counter ready on Chikyu.');
+  console.log('Self-funded counter ready on Chikyu.');
 } catch (error) {
   console.error(`Startup failed: ${safeError(error)}`);
   alto?.child.kill('SIGTERM'); server.close(() => process.exit(1));

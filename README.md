@@ -2,9 +2,9 @@
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Gas Sponsorship. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`.
+**Demo:** [partner-demos-lab.up.railway.app](https://partner-demos-lab.up.railway.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Account Abstraction. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`.
 
-The hosted AA demo uses a real ERC-4337 v0.7 paymaster and supports wallets with zero DOGE. See [AA setup and provider handoff](docs/aa-sponsorship.md) for contracts, API examples, costs, limits, and deployment. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
+The hosted AA demo uses ERC-4337 v0.7 with a SimpleAccount derived with salt `0`. The user funds that account with DOGE and it pays for its operations, including the DogeOS data fee. See [AA setup and provider handoff](docs/account-abstraction.md) for contracts, API examples, costs, limits, and deployment. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
 
 The hosted demo offers Google and X sign-in through its own registered DogeOS client, matching Questing, and connects the EVM wallet for all four routes. DogeOS manages the OAuth providers; no Google or X credentials belong in this app.
 
@@ -14,7 +14,7 @@ External Rule still requires a staging partner key and quest ID. Its demo endpoi
 
 ## Contents
 
-- [AA setup and provider handoff](docs/aa-sponsorship.md)
+- [AA setup and provider handoff](docs/account-abstraction.md)
 - [Randomness backend](randomness/README.md)
 - [Choose your integration](#choose-your-integration)
 - [Start in staging](#start-in-staging)

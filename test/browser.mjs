@@ -6,7 +6,7 @@ const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] }
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 const errors = []; page.on('pageerror', error => errors.push(error.message));
 await mkdir('test/results', { recursive: true });
-for (const route of ['/', '/external','/onchain','/randomness','/sponsorship']) {
+for (const route of ['/', '/external','/onchain','/randomness','/aa']) {
   const response = await page.goto(`${base}${route}`); assert.equal(response.status(), 200);
   await page.locator('main').waitFor();
   await page.waitForTimeout(1000);

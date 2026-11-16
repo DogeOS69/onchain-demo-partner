@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
-import { createPublicClient, createWalletClient, defineChain, http } from '../sponsorship/node_modules/viem/_esm/index.js';
-import { privateKeyToAccount } from '../sponsorship/node_modules/viem/_esm/accounts/index.js';
+import { createPublicClient, createWalletClient, defineChain, http } from '../aa/node_modules/viem/_esm/index.js';
+import { privateKeyToAccount } from '../aa/node_modules/viem/_esm/accounts/index.js';
 assert(process.env.TEST_KEY_FILE, 'Use a private, funded testnet wallet file');
 const owner = privateKeyToAccount(JSON.parse(await readFile(process.env.TEST_KEY_FILE, 'utf8')).privateKey);
 const base = process.env.WEB_URL || 'http://127.0.0.1:5190';

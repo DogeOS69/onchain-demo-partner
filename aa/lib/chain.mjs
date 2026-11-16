@@ -8,7 +8,7 @@ export const chainId = 6281971;
 export const rpcUrl = 'https://rpc.testnet.dogeos.com';
 export const explorerUrl = 'https://dogeos-testnet.l2scan.co';
 export const feeOracle = '0x5300000000000000000000000000000000000002';
-export const accountSalt = 20261112n;
+export const accountSalt = 0n;
 export const chain = defineChain({ id: chainId, name: 'DogeOS Chikyu', testnet: true,
   nativeCurrency: { name: 'DOGE', symbol: 'DOGE', decimals: 18 },
   rpcUrls: { default: { http: [rpcUrl] } },
@@ -43,8 +43,6 @@ export function safeError(error) {
     .replace(/0x[0-9a-f]{64,}/gi, '[redacted]').slice(0, 300);
 }
 export async function artifact(name) {
-  const path = name === 'CounterPaymaster'
-    ? new URL('../artifacts/CounterPaymaster.json', import.meta.url)
-    : new URL(`../node_modules/@account-abstraction/contracts/artifacts/${name}.json`, import.meta.url);
+  const path = new URL(`../node_modules/@account-abstraction/contracts/artifacts/${name}.json`, import.meta.url);
   return readJson(path);
 }

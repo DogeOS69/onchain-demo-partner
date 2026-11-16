@@ -37,47 +37,7 @@
       "creationDataHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
       "runtimeCodeHash": "0x22dbcbfa136fcf31bd56a73a11492356bbfac658009dc867cfb0a61485bd7b37",
       "transactionHash": "0x0997d29a4434bd4112b8d29bdb618ef3928e0ac0fafa7e672a333cb4d2a51e11"
-    },
-    "SimpleAccount": {
-      "address": "0x30aACD0f45bc25878b264baf36A83858a2169ba0",
-      "runtimeCodeHash": "0x35ed583f36f299d5136dc68a2b3f18bab3959a3238cd1471acc2b4e3dc668094"
-    },
-    "Counter": {
-      "address": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
-      "runtimeCodeHash": "0x272e78b3a78a47832b2e52f4d63e931a762e58cb43cb5be39e25004e9e10d450"
-    },
-    "CounterPaymaster": {
-      "address": "0x2be7db35831a06de47b5b5c55858cb14ecc308dd",
-      "runtimeCodeHash": "0x4d1b549ffc46dd3ab78798f03067cdf1050906675eab3ee6bda63fdbe1913711",
-      "transactionHash": "0x851241121c2642a7a6be7f4fb97a0132599bd5d85dca9dea519789e211d28c65"
     }
   },
-  "accountSalt": "20261112",
-  "paymaster": "0x2be7db35831a06de47b5b5c55858cb14ecc308dd",
-  "quoteSigner": "0x47bd6E3E0a8a17aC866A8d3f49D927b97F28a005",
-  "executor": "0x0FDd7B8DDE2A4634B3328AE0Db2f375688A101aF",
-  "deployer": "0x6841daCCc954413b96641Ef55783367a140c2E8a",
-  "deploymentBlock": "9418919",
-  "transactions": {
-    "fund-deployer": {
-      "hash": "0xc4e36a114d950159989fa97afeaf8ff572c5846c5b12821a18da87cdb4dce8b7",
-      "blockNumber": "9418900"
-    },
-    "deploy-paymaster": {
-      "hash": "0x851241121c2642a7a6be7f4fb97a0132599bd5d85dca9dea519789e211d28c65",
-      "blockNumber": "9418919"
-    },
-    "fund-executor": {
-      "hash": "0xb7366572fde88d01c4b93ee4449e3ca05bc2fde78dcc451fb8e63dd2404cebf4",
-      "blockNumber": "9418938"
-    },
-    "deposit": {
-      "hash": "0xd493709d9e5dcb8ee0b7cfb366f95da40ba3c53a71ba8927b3955be49e9cd856",
-      "blockNumber": "9418957"
-    },
-    "stake": {
-      "hash": "0xde07f46b0c99c03dec44e612bb78fc1070c554b10a00a95eb9479eed612c5deb",
-      "blockNumber": "9418976"
-    }
-  }
+  "accountSalt": "0"
 }

@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ConnectBar />
             <DemoNav />
             <main id="main">{children}</main>
-            <footer>Testnet examples · <a href="https://github.com/DogeOS69/onchain-demo-partner/tree/feat/partner-aa-sponsorship">Source</a></footer>
+            <footer>Testnet examples · <a href="https://github.com/DogeOS69/onchain-demo-partner/tree/feat/partner-aa-self-paid">Source</a></footer>
           </div>
         </Providers>
       </body>
