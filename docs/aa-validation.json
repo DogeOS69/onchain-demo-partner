@@ -1,0 +1,93 @@
+{
+  "verifiedAt": "2026-11-16T02:38:43.458Z",
+  "sourceCommit": "e7d6a10",
+  "chainId": 6281971,
+  "accountSalt": "0",
+  "funding": "account",
+  "deployments": {
+    "backend": {
+      "serviceId": "3afc2a36-1790-42a9-a223-f27b57b37fb2",
+      "deploymentId": "4c93ba9a-e6ac-4320-aad9-3dfa9ed0ebaf",
+      "status": "SUCCESS"
+    },
+    "web": {
+      "serviceId": "27dda62f-d5b2-44dd-9b93-424df63c7a7f",
+      "deploymentId": "1dd4f8fd-50bd-4bf3-9b66-9e0a954487e7",
+      "status": "SUCCESS"
+    }
+  },
+  "checks": {
+    "backendTests": 6,
+    "backendResult": "PASS",
+    "productionWebBuild": "PASS",
+    "hostedSmoke": {
+      "errors": [],
+      "routes": 5,
+      "mobileWidth": 360
+    },
+    "hostedEndpoints": {
+      "base": "https://partner-demos-lab.up.railway.app",
+      "config": {
+        "chainId": 6281971,
+        "chainName": "DogeOS Chikyu",
+        "rpcUrl": "https://rpc.testnet.dogeos.com",
+        "explorerUrl": "https://dogeos-testnet.l2scan.co",
+        "entryPoint": "0x799ccb45f55ba51050fec1d2a1b30b65f99c4e81",
+        "entryPointVersion": "0.7",
+        "accountFactory": "0x10f2e1986d392d4f5e63ea8a8d60c8da73f7dd2f",
+        "accountSalt": "0",
+        "counter": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+        "executor": "0x0FDd7B8DDE2A4634B3328AE0Db2f375688A101aF",
+        "operationsEnabled": true,
+        "requiredConfirmations": 18,
+        "funding": "account"
+      },
+      "legacyPageRedirectVerified": true,
+      "oldApiStatus": 404,
+      "invalidOwnerStatus": 400
+    }
+  },
+  "liveAA": {
+    "base": "http://127.0.0.1:5190",
+    "owner": "0xeB534EF2043c16f3537F014712dAC2fDf832582f",
+    "account": "0x9cA95C13744Df3BD20C2334c18A4E5b1459c485B",
+    "salt": 0,
+    "count": "2",
+    "transactionUrl": "https://dogeos-testnet.l2scan.co/tx/0xcc6ae3472acac9bdebab183d5337902d8139dc9d3e57db6fdb0d061633fe2872",
+    "errors": [],
+    "userChargeWei": "93847921647475803",
+    "networkFeeWei": "74211933027130721",
+    "l1FeeWei": "74210446129624232",
+    "fundedWei": "100000000000000000",
+    "accountBeforeWei": "1927081551754210",
+    "personalSignCount": 2,
+    "ownerTransactionRequests": [
+      "eth_sendTransaction",
+      "eth_sendTransaction"
+    ],
+    "reloadRecovered": true,
+    "reconnectedAfterReload": false,
+    "sharedSdkConnection": true,
+    "fundingCancellationRecovered": true,
+    "signatureCancellationRecovered": true,
+    "backend": "https://partner-demos-lab.up.railway.app/api/aa",
+    "clientMode": "Local build of the same web UI with the registered SDK client and external-wallet login; published backend and real Chikyu transactions.",
+    "oauthCompleted": false,
+    "paymaster": "0x0000000000000000000000000000000000000000",
+    "userOpHash": "0x4f3a892fc2f68fbe612ed3bdf71e22b888c5b878e8543e04546bb12734d095d5",
+    "nonce": "1",
+    "confirmationsAtVerification": 42,
+    "userChargeDoge": "0.093847921647475803",
+    "networkFeeDoge": "0.074211933027130721",
+    "fullNetworkFeeCovered": true,
+    "chargeWithin150PercentOfNetworkFee": true
+  },
+  "initialAccountDeployment": {
+    "transactionHash": "0xba0ebd662d454d08dd0de69df33f717cc6b409142a349a78eef78eafe26e319d",
+    "note": "Salt-0 account creation and first counter increment passed. This receipt exposed excessive uncompressed fee estimation; it is preserved as the regression fixture, and the final run above uses the corrected compressed-envelope model."
+  },
+  "limitations": [
+    "The browser transaction test uses a test EIP-1193 provider with signing in Node, not a human wallet extension or Google/X OAuth.",
+    "The displayed gas maximum includes a fee buffer; preVerificationGas is charged in full."
+  ]
+}
