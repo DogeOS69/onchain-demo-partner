@@ -6,7 +6,7 @@ Integrate DogeOS quests using onchain smart contract events or actions verified 
 
 **This branch is the separate [EIP-7702 devnet lab](docs/aa-7702.md), [live here](https://partner-7702-demo-lab.up.railway.app/aa).** Its two actions activate the EOA's delegation and increment the counter through ERC-4337 v0.9. Both are paid by the account in DOGE. The browser uses a disposable lab account because the published SDK does not expose authorization signing. Real devnet activation and counter transactions passed browser validation with 18 confirmations, zero paymaster and reload recovery; see the [receipts](docs/aa-7702-devnet-validation.json). This runs in separate services from the hosted testnet demo.
 
-The base branch `feat/partner-aa-self-paid` implements the SDK-owned SimpleAccount with salt 0; its [v0.9 rollout](docs/entrypoint-09.md) is also awaiting testnet funds. See [base AA setup](docs/account-abstraction.md). The remaining older examples below belong to that base application.
+The base branch `feat/partner-aa-self-paid` implements the SDK-owned SimpleAccount with salt 0. Its [v0.9 rollout](docs/entrypoint-09.md) is also deployed and verified on Chikyū; see the [base validation receipts](docs/aa-validation.json) and [base AA setup](docs/account-abstraction.md). The remaining older examples below belong to that base application.
 
 The hosted demo offers Google and X sign-in through its own registered DogeOS client, matching Questing, and connects the EVM wallet for all four routes. DogeOS manages the OAuth providers; no Google or X credentials belong in this app.
 
