@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
-import { encodeFunctionData, formatEther, getAddress, keccak256, numberToHex, parseEventLogs, zeroAddress } from 'viem';
+import { formatEther, getAddress, keccak256, numberToHex, parseEventLogs, zeroAddress } from 'viem';
 import { accountAbi, accountSalt, artifact, counterAbi, factoryAbi, feeOracle, json,
   oracleAbi, readJson, reader, same, saveJson, safeError } from './chain.mjs';
 import { ApiError, checkIntent, executionGas, factoryCall, incrementCall, limits, maxCost,
   operationHash, ownerAddress, packOperation, publicOperation, stubSignature, verifyOwner } from './user-operation.mjs';
 
+import { bundleEnvelope, oraclePayload } from './data-fee.mjs';
+
+const feeModel = 'chikyu-zstd-v1';
 const implementationSlot = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
 const activeStates = ['submitted', 'included'];
 
@@ -56,14 +59,17 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
   }
 
   async function dataFeeFor(op) {
-    // One operation per bundle; nonzero padding covers its signed transaction envelope.
-    const packed = packOperation({ ...op, signature: `0x${'ff'.repeat(65)}` });
-    const data = encodeFunctionData({ abi: entry.abi, functionName: 'handleOps', args: [[packed], executor] });
-    if ((data.length - 2) / 2 + 256 > 4096) throw new ApiError(400, 'Operation too large.');
-    return manifest.chainId === 31337 ? 0n : client.readContract({
-      address: feeOracle, abi: oracleAbi, functionName: 'getL1Fee', args: [`0x${'ff'.repeat(256)}${data.slice(2)}`],
-    });
+    if (manifest.chainId === 31337) return 0n;
+    const [nonce, galileo] = await Promise.all([
+      client.getTransactionCount({ address: executor, blockTag: 'pending' }),
+      client.readContract({ address: feeOracle, abi: oracleAbi, functionName: 'isGalileo' }),
+    ]);
+    const envelope = bundleEnvelope(op, manifest, entry.abi, executor, nonce);
+    if ((envelope.length - 2) / 2 > 4096) throw new ApiError(400, 'Operation too large.');
+    return client.readContract({ address: feeOracle, abi: oracleAbi, functionName: 'getL1Fee',
+      args: [oraclePayload(envelope, galileo)] });
   }
+
   async function reserveFor(op) {
     const dataFee = (await dataFeeFor(op)) * 125n / 100n;
     const price = BigInt(op.maxFeePerGas);
@@ -85,7 +91,7 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
       const active = owned.find(op => activeStates.includes(op.status));
       if (active) return publicOperation(active);
       const block = await client.getBlock();
-      const prior = owned.find(op => op.status === 'prepared' && op.validUntil > Number(block.timestamp) + 30);
+      const prior = owned.find(op => op.status === 'prepared' && op.feeModel === feeModel && op.validUntil > Number(block.timestamp) + 30);
       if (prior && await nonceOf(prior.account) === BigInt(prior.userOperation.nonce)) {
         try { await reserveFor(prior.userOperation); return publicOperation(prior); } catch { /* Refresh changed fees. */ }
       }
@@ -130,7 +136,7 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
       assert.equal(hash, await client.readContract({ address: manifest.entryPoint, abi: entry.abi,
         functionName: 'getUserOpHash', args: [packOperation(op)] }), 'UserOperation hash mismatch');
       const validUntil = Number(block.timestamp) + limits.preparationSeconds;
-      const result = { id: randomUUID(), status: 'prepared', chainId: manifest.chainId, owner, account,
+      const result = { id: randomUUID(), status: 'prepared', feeModel, chainId: manifest.chainId, owner, account,
         counter: manifest.counter, counterBefore: count.toString(),
         userOpHash: hash, userOperation: op, validUntil,
         expiresAt: new Date(validUntil * 1000).toISOString(), startBlock: block.number.toString(),
@@ -231,7 +237,7 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
       if (!op) throw new ApiError(404, 'Operation not found.');
       await verifyOwner(op.userOpHash, signature, op.owner);
       if (activeStates.includes(op.status) || op.status === 'confirmed') return publicOperation(op);
-      if (op.status !== 'prepared') throw new ApiError(409, 'Prepare a new operation.');
+      if (op.status !== 'prepared' || op.feeModel !== feeModel) throw new ApiError(409, 'Prepare a new operation.');
       if (Object.values(db.operations).some(other => activeStates.includes(other.status))) throw new ApiError(409, 'Another operation is confirming. Try again shortly.');
       const block = await client.getBlock();
       if (Number(block.timestamp) + 15 >= op.validUntil) throw new ApiError(409, 'The fee preview expired. Prepare again.');

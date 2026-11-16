@@ -25,7 +25,7 @@ export const factoryAbi = parseAbi([
   'function getAddress(address owner, uint256 salt) view returns (address)',
   'function createAccount(address owner, uint256 salt) returns (address)',
 ]);
-export const oracleAbi = parseAbi(['function getL1Fee(bytes data) view returns (uint256)']);
+export const oracleAbi = parseAbi(['function getL1Fee(bytes data) view returns (uint256)', 'function isGalileo() view returns (bool)']);
 export const json = (value) => JSON.stringify(value, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2);
 export const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.toLowerCase() === b.toLowerCase();
 export const reader = () => createPublicClient({ chain, transport: http(rpcUrl, { retryCount: 1, timeout: 20_000 }) });

@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { createPublicClient, createWalletClient, http, parseEther, parseAbi, parseEventLogs, zeroAddress } from '../aa/node_modules/viem/_esm/index.js';
 import { generatePrivateKey, privateKeyToAccount } from '../aa/node_modules/viem/_esm/accounts/index.js';
+// Build the web app with a registered client ID and NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=false.
+// AA_API_URL may point to the hosted /api/aa endpoint for a live-backend test.
 const base = process.env.WEB_URL || 'http://127.0.0.1:5190';
 assert(process.env.TEST_KEY_FILE);
 let keys = await readFile(process.env.TEST_KEY_FILE, 'utf8').then(JSON.parse).catch(() => null);
@@ -15,12 +17,14 @@ const wallet = createWalletClient({ account: owner, chain, transport: http(manif
 const account = await rpc.readContract({ address: manifest.accountFactory,
   abi: parseAbi(['function getAddress(address,uint256) view returns (address)']), functionName: 'getAddress', args: [owner.address, 0n] });
 const ownerBefore = await rpc.getBalance({ address: owner.address });
-assert(ownerBefore >= parseEther('0.55'), 'Fund the dedicated test owner before this real testnet test.');
+assert(ownerBefore > 0n, 'Fund the dedicated test owner before this real testnet test.');
+const depositAbi = parseAbi(['function balanceOf(address) view returns (uint256)']);
+const accountBefore = await rpc.getBalance({ address: account }) + await rpc.readContract({ address: manifest.entryPoint, abi: depositAbi, functionName: 'balanceOf', args: [account] });
 await mkdir('test/results', { recursive: true });
 let funded = 0n;
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-const errors = [], methods = []; let connected = false;
+const errors = [], methods = []; let connected = false, rejectFunding = true, rejectSignature = true;
 page.on('pageerror', e => { errors.push(e.message); console.log('PAGE ERROR:', e.message); });
 page.on('console', msg => { if (msg.type() === 'error') console.log('CONSOLE:', msg.text().slice(0, 300)); });
 await page.exposeBinding('testWalletRequest', async (_, { method, params = [] }) => {
@@ -31,8 +35,9 @@ await page.exposeBinding('testWalletRequest', async (_, { method, params = [] })
   if (method === 'net_version') return '6281971';
   if (method === 'wallet_switchEthereumChain' || method === 'wallet_addEthereumChain') return null;
   if (method === 'wallet_requestPermissions' || method === 'wallet_getPermissions') { connected = true; return [{ parentCapability: 'eth_accounts' }]; }
-  if (method === 'personal_sign') { assert(/^0x[0-9a-f]{64}$/i.test(params[0])); assert.equal(params[1].toLowerCase(), owner.address.toLowerCase()); return owner.signMessage({ message: { raw: params[0] } }); }
+  if (method === 'personal_sign') { if (rejectSignature) { rejectSignature = false; throw Object.assign(new Error('User rejected signature'), { code: 4001 }); } assert(/^0x[0-9a-f]{64}$/i.test(params[0])); assert.equal(params[1].toLowerCase(), owner.address.toLowerCase()); return owner.signMessage({ message: { raw: params[0] } }); }
   if (method === 'eth_sendTransaction') {
+    if (rejectFunding) { rejectFunding = false; throw Object.assign(new Error('User rejected funding'), { code: 4001 }); }
     const tx = params[0];
     assert.equal(tx.from.toLowerCase(), owner.address.toLowerCase());
     assert.equal(tx.to.toLowerCase(), account.toLowerCase());
@@ -72,14 +77,23 @@ await page.getByRole('button', { name: 'Prepare increment', exact: true }).click
 const addFunds = page.getByRole('button', { name: /^Add .* DOGE from wallet$/ });
 await addFunds.waitFor({ timeout: 90000 });
 await page.screenshot({ path: 'test/results/aa-fee-preview.png', fullPage: true });
+assert(!methods.includes('personal_sign'));
+await addFunds.click();
+await page.getByRole('alert').filter({ hasText: 'Wallet request cancelled.' }).waitFor();
 await addFunds.click();
 await page.getByRole('button', { name: 'Sign and increment', exact: true }).waitFor({ timeout: 90000 });
+await page.getByRole('button', { name: 'Sign and increment', exact: true }).click();
+await page.getByRole('alert').filter({ hasText: 'Wallet request cancelled.' }).waitFor();
 await page.getByRole('button', { name: 'Sign and increment', exact: true }).click();
 const confirmed = page.getByText('Confirmed on Chikyū.', { exact: true });
 await Promise.race([confirmed.waitFor({ timeout: 210000 }), page.locator('main [role=alert]').waitFor({ timeout: 210000 }).then(async () => { throw new Error(await page.locator('main [role=alert]').innerText()); })]);
 const count = await page.locator('.result-value').innerText();
 const transactionUrl = await page.getByRole('link', { name: 'View transaction' }).getAttribute('href');
 await page.screenshot({ path: 'test/results/aa-confirmed.png', fullPage: true });
+await page.setViewportSize({ width: 360, height: 800 });
+assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+await page.screenshot({ path: 'test/results/aa-mobile.png', fullPage: true });
+await page.setViewportSize({ width: 1280, height: 900 });
 await page.reload();
 await page.waitForTimeout(4000);
 const reconnectedAfterReload = await page.getByRole('button', { name: 'Connect Wallet', exact: true }).first().isVisible();
@@ -102,10 +116,11 @@ assert(event.args.success && event.args.actualGasCost > 0n);
 const raw = await rpc.request({ method: 'eth_getTransactionReceipt', params: [hash] });
 const networkFee = receipt.gasUsed * receipt.effectiveGasPrice + BigInt(raw.l1Fee);
 assert(event.args.actualGasCost >= networkFee, 'The smart account must cover the full network fee.');
+assert(event.args.actualGasCost <= networkFee * 150n / 100n, 'Gas quote must account for compression, without excessive headroom.');
 const deposit = await rpc.readContract({ address: manifest.entryPoint, abi: parseAbi(['function balanceOf(address) view returns (uint256)']), functionName: 'balanceOf', args: [account] });
-assert.equal(funded - await rpc.getBalance({ address: account }) - deposit, event.args.actualGasCost);
+assert.equal(accountBefore + funded - await rpc.getBalance({ address: account }) - deposit, event.args.actualGasCost);
 await mkdir('test/results', { recursive: true });
 await writeFile('test/results/browser-aa.json', JSON.stringify({ base, owner: owner.address, account, salt: 0, count, transactionUrl, errors,
-  userChargeWei: String(event.args.actualGasCost), networkFeeWei: String(networkFee), l1FeeWei: String(BigInt(raw.l1Fee)), fundedWei: String(funded),
-  personalSignCount: methods.filter(m => m === 'personal_sign').length, ownerTransactionRequests: methods.filter(m => ['eth_sendTransaction','eth_signTransaction','eth_sendRawTransaction'].includes(m)), reloadRecovered: true, reconnectedAfterReload, sharedSdkConnection: true }, null, 2));
+  userChargeWei: String(event.args.actualGasCost), networkFeeWei: String(networkFee), l1FeeWei: String(BigInt(raw.l1Fee)), fundedWei: String(funded), accountBeforeWei: String(accountBefore),
+  personalSignCount: methods.filter(m => m === 'personal_sign').length, ownerTransactionRequests: methods.filter(m => ['eth_sendTransaction','eth_signTransaction','eth_sendRawTransaction'].includes(m)), reloadRecovered: true, reconnectedAfterReload, sharedSdkConnection: true, fundingCancellationRecovered: true, signatureCancellationRecovered: true }, null, 2));
 await browser.close(); assert.equal(errors.length, 0, errors.join('\n')); console.log(`PASS: SDK wallet → funded smart account → self-paid counter ${count} → reload recovery; ${transactionUrl}`);
