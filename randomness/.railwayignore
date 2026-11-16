@@ -1,0 +1,10 @@
+node_modules
+web
+.git
+.runtime
+.env
+.env.*
+test
+vendor
+output
+*.log

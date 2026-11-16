@@ -1,0 +1,32 @@
+{
+  "name": "chikyu-randomness-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "compile": "node scripts/compile.mjs",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "keeper": "node keeper/index.mjs",
+    "status": "node scripts/status.mjs",
+    "request": "node scripts/request.mjs",
+    "fulfill": "node scripts/fulfill.mjs",
+    "sync:web": "node scripts/sync-web.mjs"
+  },
+  "dependencies": {
+    "viem": "2.57.18"
+  },
+  "devDependencies": {
+    "@foundry-rs/anvil": "1.7.1",
+    "@kevincharm/bls-bn254": "2.0.0",
+    "@openzeppelin/contracts": "5.0.2",
+    "@openzeppelin/contracts-upgradeable": "5.0.2",
+    "@scroll-tech/contracts": "0.1.0",
+    "playwright": "1.58.2",
+    "solady": "0.0.245",
+    "solc": "0.8.28"
+  }
+}

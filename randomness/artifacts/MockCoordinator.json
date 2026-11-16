@@ -1,0 +1,117 @@
+{
+  "contractName": "MockCoordinator",
+  "sourceName": "test/MockCoordinator.sol",
+  "compiler": "0.8.28+commit.7893614a.Emscripten.clang",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "currentBeaconPubKeyHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "word",
+          "type": "uint256"
+        }
+      ],
+      "name": "deliver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "getRequestPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nextId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestRandomness",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6080604052600180553480156012575f5ffd5b50604051610295380380610295833981016040819052602f916035565b5f55604b565b5f602082840312156044575f5ffd5b5051919050565b61023d806100585f395ff3fe608060405260043610610049575f3560e01c806310b0d1d21461004d5780631f53cf041461008857806361b8ce8c146100a9578063a31659f6146100be578063e0fce922146100d2575b5f5ffd5b348015610058575f5ffd5b5061006e61006736600461016f565b505f908190565b604080519283526020830191909152015b60405180910390f35b61009b610096366004610186565b6100f3565b60405190815260200161007f565b3480156100b4575f5ffd5b5061009b60015481565b3480156100c9575f5ffd5b5061009b5f5481565b3480156100dd575f5ffd5b506100f16100ec3660046101a6565b61010e565b005b600180545f9182610103836101e3565b909155509392505050565b60405163210b9f0360e01b815260048101839052602481018290526001600160a01b0384169063210b9f03906044015f604051808303815f87803b158015610154575f5ffd5b505af1158015610166573d5f5f3e3d5ffd5b50505050505050565b5f6020828403121561017f575f5ffd5b5035919050565b5f5f60408385031215610197575f5ffd5b50508035926020909101359150565b5f5f5f606084860312156101b8575f5ffd5b83356001600160a01b03811681146101ce575f5ffd5b95602085013595506040909401359392505050565b5f6001820161020057634e487b7160e01b5f52601160045260245ffd5b506001019056fea264697066735822122073215ef955aa7a71a7b32fdd9e1a6a321642214702f38832f43af2827dfaa0fb64736f6c634300081c0033",
+  "deployedBytecode": "0x608060405260043610610049575f3560e01c806310b0d1d21461004d5780631f53cf041461008857806361b8ce8c146100a9578063a31659f6146100be578063e0fce922146100d2575b5f5ffd5b348015610058575f5ffd5b5061006e61006736600461016f565b505f908190565b604080519283526020830191909152015b60405180910390f35b61009b610096366004610186565b6100f3565b60405190815260200161007f565b3480156100b4575f5ffd5b5061009b60015481565b3480156100c9575f5ffd5b5061009b5f5481565b3480156100dd575f5ffd5b506100f16100ec3660046101a6565b61010e565b005b600180545f9182610103836101e3565b909155509392505050565b60405163210b9f0360e01b815260048101839052602481018290526001600160a01b0384169063210b9f03906044015f604051808303815f87803b158015610154575f5ffd5b505af1158015610166573d5f5f3e3d5ffd5b50505050505050565b5f6020828403121561017f575f5ffd5b5035919050565b5f5f60408385031215610197575f5ffd5b50508035926020909101359150565b5f5f5f606084860312156101b8575f5ffd5b83356001600160a01b03811681146101ce575f5ffd5b95602085013595506040909401359392505050565b5f6001820161020057634e487b7160e01b5f52601160045260245ffd5b506001019056fea264697066735822122073215ef955aa7a71a7b32fdd9e1a6a321642214702f38832f43af2827dfaa0fb64736f6c634300081c0033"
+}

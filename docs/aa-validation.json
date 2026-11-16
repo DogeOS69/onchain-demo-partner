@@ -1,0 +1,130 @@
+{
+  "verifiedAt": "2026-11-16T05:34:03.501978+00:00",
+  "sourceBranch": "feat/partner-aa-self-paid",
+  "implementationBaseCommit": "dfdc014123283d55fad1e498956083ed592fe1ea",
+  "chainId": 6281971,
+  "genesisHash": "0xf9f7c524dce38b51a4d28ec2f18680773e5ba9d3f5f430d0e05f92cfeb65b1bc",
+  "entryPointVersion": "0.9",
+  "accountSalt": "0",
+  "funding": "account",
+  "preinstallsVersion": "v0.2.2",
+  "upstreamCommit": "b36a1ed52ae00da6f8a4c8d50181e2877e4fa410",
+  "deployments": {
+    "backend": {
+      "serviceId": "3afc2a36-1790-42a9-a223-f27b57b37fb2",
+      "deploymentId": "b1653106-3ad7-45ee-9147-2d34dcef1cb6",
+      "status": "SUCCESS"
+    },
+    "web": {
+      "serviceId": "27dda62f-d5b2-44dd-9b93-424df63c7a7f",
+      "deploymentId": "49313124-01c5-470b-8282-7ab025dba9c4",
+      "status": "SUCCESS"
+    }
+  },
+  "checks": {
+    "backendTestsPreviouslyPassed": 8,
+    "backendImplementationUnchanged": true,
+    "productionWebBuild": "PASS",
+    "localWebBuild": "PASS",
+    "hostedSmoke": {
+      "errors": [],
+      "routes": 5,
+      "mobileWidth": 360
+    },
+    "hostedEndpoints": {
+      "base": "https://partner-demos-lab.up.railway.app",
+      "config": {
+        "chainId": 6281971,
+        "chainName": "DogeOS Chikyu",
+        "rpcUrl": "https://rpc.testnet.dogeos.com",
+        "explorerUrl": "https://dogeos-testnet.l2scan.co",
+        "entryPoint": "0x433709009B8330FDa32311DF1C2AFA402eD8D009",
+        "entryPointVersion": "0.9",
+        "accountFactory": "0xc991D3F45eE3dBb2cB270E48195384154C9d40bb",
+        "accountSalt": "0",
+        "counter": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+        "executor": "0x0FDd7B8DDE2A4634B3328AE0Db2f375688A101aF",
+        "operationsEnabled": true,
+        "requiredConfirmations": 18,
+        "funding": "account"
+      },
+      "legacyPageRedirectVerified": true,
+      "legacyPageNavigation": {
+        "initialStatus": 200,
+        "finalUrl": "https://partner-demos-lab.up.railway.app/aa",
+        "verified": true
+      },
+      "oldApiStatus": 404,
+      "invalidOwnerStatus": 400
+    },
+    "allRuntimeCodeHashes": "PASS",
+    "browserAndBackendManifestsEqual": true,
+    "persistentState": {
+      "newV09File": "aa-operations-09.private.json",
+      "newConfirmedOperations": 1,
+      "oldFileRetained": "aa-operations-v1.private.json",
+      "oldConfirmedOperations": 2,
+      "activeOldOperationsBeforeRollout": 0
+    },
+    "publicRpcDebugTraceCall": {
+      "code": -32601,
+      "message": "Method not found"
+    }
+  },
+  "liveAA": {
+    "base": "http://127.0.0.1:5190",
+    "owner": "0xeB534EF2043c16f3537F014712dAC2fDf832582f",
+    "account": "0xCb349c9faB291d7fcaA2f8ABd6bc6Ab3068bF38B",
+    "salt": 0,
+    "count": "1",
+    "transactionUrl": "https://dogeos-testnet.l2scan.co/tx/0x78e4cdfb1125549dcb6a2b02c5e72abfe29ad47988d43e59f52a7afad0545e95",
+    "errors": [],
+    "userChargeWei": "103477924767453957",
+    "networkFeeWei": "81114875865000607",
+    "l1FeeWei": "81110404933371269",
+    "fundedWei": "110000000000000000",
+    "accountBeforeWei": "0",
+    "entryPointVersion": "0.9",
+    "typedDataSignCount": 2,
+    "ownerTransactionRequests": [
+      "eth_sendTransaction",
+      "eth_sendTransaction"
+    ],
+    "reloadRecovered": true,
+    "reconnectedAfterReload": false,
+    "sharedSdkConnection": true,
+    "fundingCancellationRecovered": true,
+    "signatureCancellationRecovered": true,
+    "backend": "https://partner-demos-lab.up.railway.app/api/aa",
+    "clientMode": "Local build of the same web UI with the registered DogeOS SDK client and injected external-wallet provider; published backend and real Chikyu transactions.",
+    "oauthCompleted": false,
+    "paymaster": "0x0000000000000000000000000000000000000000",
+    "userOpHash": "0xc893bbc8a10d95e26b989f9ab3a3e51879201998f3a3d5b07bbbe17fb30afe65",
+    "nonce": "0",
+    "confirmationsAtVerification": 85,
+    "accountCreatedByFactory": "0xc991D3F45eE3dBb2cB270E48195384154C9d40bb",
+    "accountRuntimeCodeHash": "0x7e6d58f3d03c4576b822ee69b087333082b4fab11a9c5ecdd0dbc5b166051599",
+    "userChargeDoge": "0.103477924767453957",
+    "networkFeeDoge": "0.081114875865000607",
+    "fullNetworkFeeCovered": true,
+    "chargeWithin150PercentOfNetworkFee": true
+  },
+  "initialAccountDeployment": {
+    "transactionHash": "0x78e4cdfb1125549dcb6a2b02c5e72abfe29ad47988d43e59f52a7afad0545e95",
+    "factory": "0xc991D3F45eE3dBb2cB270E48195384154C9d40bb",
+    "note": "First v0.9 operation created the salt-0 smart account and incremented its counter from 0 to 1. AccountDeployed and UserOperationEvent matched sender, factory and operation hash; nonce was 0."
+  },
+  "contractDeploymentFeesDoge": "11.881803582743836723",
+  "browserOwnerTopUpDoge": "0.5",
+  "deployerRemainingDoge": "6.878612586844044554",
+  "screenshots": {
+    "confirmed": "assets/aa-09-confirmed.png",
+    "mobile": "assets/aa-09-mobile.png"
+  },
+  "limitations": [
+    "Transaction browser validation uses the actual SDK with an injected EIP-1193 provider and signing in Node; it does not complete Google/X OAuth or exercise a human wallet extension.",
+    "The public deployment retained Google/X login and passed route/modal/mobile smoke checks.",
+    "The displayed maximum includes a data-fee buffer; preVerificationGas is charged in full.",
+    "The allowlisted, private Alto lab uses safe-mode=false; a general public bundler requires compatible tracing and production operating controls."
+  ]
+}

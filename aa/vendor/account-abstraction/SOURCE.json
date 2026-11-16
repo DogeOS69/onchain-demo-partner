@@ -1,0 +1,28 @@
+{
+  "repository": "https://github.com/eth-infinitism/account-abstraction",
+  "tag": "v0.9.0",
+  "commit": "b36a1ed52ae00da6f8a4c8d50181e2877e4fa410",
+  "files": {
+    "accounts/Simple7702Account.sol": "b3f3949232810309210dc918ff030c88a3996823a3cf53853d5995f6b7ea7c30",
+    "accounts/SimpleAccount.sol": "a17c30b7a11bd2dbba5e3a2c353aee7c6f7eaee0ca0d652b9c7ae6261511c7ea",
+    "accounts/SimpleAccountFactory.sol": "0d8f2b95a7fcb8cd839959db5f4eb2a693c34a5333a204a4cee81156372b7a26",
+    "accounts/callback/TokenCallbackHandler.sol": "9f9bca3f4998012350e1f896ce3256f87a05a2581a7cee8d9a2152b211a2efcc",
+    "core/BaseAccount.sol": "ae0bf69fdfcd64f19bb0a4e3e0aca08376bb7f054cd1a03fd763af3d186abc8c",
+    "core/Helpers.sol": "05d24bb7c0fd53038456c6f18549963dc9140d86449eb4704015266fdfe87b33",
+    "core/UserOperationLib.sol": "2dbf6820f4b1ca4ce9783c6c1770fe393b2a5fcb13630262bb2fe91d36a55617",
+    "interfaces/IAccount.sol": "2c1b8edec106515424e725970139d0bdb1f624377e3452c82095310642647ac8",
+    "interfaces/IAggregator.sol": "f2986a91e9b3c694241af5803d6657c985af962620a0646e4fdaea95ddc4d35e",
+    "interfaces/IEntryPoint.sol": "e2060869d8fb321fb5d3e6532bdf208993ee77b9e884aa5bd202a442a84c9124",
+    "interfaces/INonceManager.sol": "97dc1995fff7f88c6f3752927dd011bdfa8b34b7d2c26bcd271712cfb88063b4",
+    "interfaces/ISenderCreator.sol": "a1448e8754f7a1e9f2fd97cba36a951b55c6ab422164250913904bd587c905a2",
+    "interfaces/IStakeManager.sol": "0543d1407b61cf2a304d4f76ed57a30e1036dbd9981c27885847f6d0be898804",
+    "interfaces/PackedUserOperation.sol": "b97a22200971ed07c3f272146554045276d833d71f2961f12c1adf5475d4a5a5",
+    "utils/Exec.sol": "fb027b5d2397bf767cc1caa5660c408ea900c1a8c48b8e2db1b19ae6e856972d"
+  },
+  "entryPointCreation": {
+    "repository": "DogeOS69/dogeos-preinstalls",
+    "commit": "b24d252b97c46b750e8f96779bbb4a48222908fe",
+    "path": "data/creation/entry-point-v09.bin",
+    "sha256": "31e07a4e3b6d1be5e384d6e09b2c0621749a352b39a803976bc4a9bc25828620"
+  }
+}

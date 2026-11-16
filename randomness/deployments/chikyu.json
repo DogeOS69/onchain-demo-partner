@@ -1,0 +1,68 @@
+{
+  "chainId": 6281971,
+  "network": "DogeOS Chikyu",
+  "rpcUrl": "https://rpc.testnet.dogeos.com",
+  "explorer": "https://dogeos-testnet.l2scan.co",
+  "deployer": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+  "createdAt": "2026-11-12T03:54:15.196Z",
+  "beacon": {
+    "public_key": "07e1d1d335df83fa98462005690372c643340060d205306a9aa8106b6bd0b3820557ec32c2ad488e4d4f6008f89a346f18492092ccc0d594610de2732c8b808f0095685ae3a85ba243747b1b2f426049010f6b73a0cf1d389351d5aaaa1047f6297d3a4f9749b33eb2d904c9d9ebf17224150ddd7abd7567a9bec6c74480ee0b",
+    "period": 3,
+    "genesis_time": 1727521075,
+    "genesis_seed": "cd7ad2f0e0cce5d8c288f2dd016ffe7bc8dc88dbb229b3da2b6ad736490dfed6",
+    "chain_hash": "04f1e9062b8a81f848fded9c12306733282b2727ecced50032187751166ec8c3",
+    "scheme": "bls-bn254-unchained-on-g1",
+    "beacon_id": "evmnet"
+  },
+  "policy": {
+    "delaySeconds": 90,
+    "minConfirmations": 18,
+    "callbackGasLimit": 150000,
+    "requestPremiumMultiplierBps": 0
+  },
+  "contracts": {
+    "DrandBeacon": {
+      "address": "0x2d0e53523950d651b94ce20591e110f7f0aa01f6",
+      "transactionHash": "0xd9b4036464d4243baff6218b8cc9beba6658eab93231fcd51eedbeb644874012",
+      "blockNumber": "9400125",
+      "estimatedCostDoge": "1.134802466594963865",
+      "gasUsed": "1892105"
+    },
+    "GasStationScroll": {
+      "address": "0xfccd4bc9e371aef255ed96554e6108ec6098894b",
+      "transactionHash": "0x650247d97bf0c094a451ea8fb4fb0f33319f484190524c6ada1154e477e0179f",
+      "blockNumber": "9400126",
+      "estimatedCostDoge": "0.07347349341819496",
+      "gasUsed": "259624"
+    },
+    "Anyrand": {
+      "address": "0x6dec91b6ba93b3904d5995d238b0055349a3b0d9",
+      "transactionHash": "0x3fafb41ea932d6d7ac1f50844512d9369febb09d8f24c2b12495af369f45c520",
+      "blockNumber": "9400128",
+      "estimatedCostDoge": "0.882570403579283159",
+      "gasUsed": "1793356"
+    },
+    "Coordinator": {
+      "address": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
+      "transactionHash": "0x7bc206ce6881d1bf08948e2b6e528a111e4a2924900c306c9b244317b2499a27",
+      "blockNumber": "9400130",
+      "estimatedCostDoge": "0.096315539798179244",
+      "gasUsed": "349023"
+    },
+    "RandomnessDemo": {
+      "address": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+      "transactionHash": "0x8e241496480cfb36947a92169a9d62517ac622662d2fd6163d0732bcb6696422",
+      "blockNumber": "9400131",
+      "estimatedCostDoge": "0.367589275676409705",
+      "gasUsed": "821750"
+    }
+  },
+  "complete": true,
+  "balanceAfterDeploymentDoge": "40.989105086639155161",
+  "keeperUrl": "https://keeper-production-fd08a51c.up.railway.app",
+  "railway": {
+    "projectId": "30b765d5-9f54-49c8-9357-b3775f0ac655",
+    "environmentId": "e9453bfa-e87d-4f2f-a1f4-556dcdb98274",
+    "serviceId": "6812147c-c1db-49fa-a63d-711078c29f8c"
+  }
+}

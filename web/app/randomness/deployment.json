@@ -1,0 +1,15 @@
+{
+  "chainId": 6281971,
+  "rpcUrl": "https://rpc.testnet.dogeos.com",
+  "explorer": "https://dogeos-testnet.l2scan.co",
+  "consumer": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+  "coordinator": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
+  "beacon": "0x2d0e53523950d651b94ce20591e110f7f0aa01f6",
+  "deploymentBlock": "9400131",
+  "genesis": 1727521075,
+  "period": 3,
+  "beaconHash": "04f1e9062b8a81f848fded9c12306733282b2727ecced50032187751166ec8c3",
+  "minConfirmations": 18,
+  "keeperUrl": "https://keeper-production-fd08a51c.up.railway.app",
+  "requestDelay": 90
+}
