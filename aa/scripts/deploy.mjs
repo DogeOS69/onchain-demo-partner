@@ -36,7 +36,8 @@ async function deploy(name, contract, args = [], canonical) {
   const saved = state.contracts[name];
   const address = canonical ?? saved?.address;
   const code = address && await client.getCode({ address });
-  if (code && code !== '0x') {
+  if (code && code !== '0x' && !saved?.pending) {
+    if (saved) assert.equal(saved.creationDataHash, keccak256(data), 'Saved deployment intent changed');
     const expected = canonical ? entryPointCodeHashes[chain.id] : saved.runtimeCodeHash;
     assert.equal(keccak256(code), expected, name + ' code changed');
     const result = saved ?? { address, runtimeCodeHash: expected, bytecodeHash: keccak256(contract.bytecode), creationDataHash: keccak256(data), preinstalled: true };
@@ -59,15 +60,17 @@ async function deploy(name, contract, args = [], canonical) {
     console.log(name + ': upper estimate ' + formatEther(cost) + ' DOGE');
     if (!apply) return { address: canonical ?? getContractAddress({ from: account.address, nonce: BigInt(nonce) }), planned: true };
     assert(await client.getBalance({ address: account.address }) > cost + parseEther('0.25'), 'Insufficient testnet DOGE');
-    pending = { raw, hash: keccak256(raw), address: canonical ?? getContractAddress({ from: account.address, nonce: BigInt(nonce) }) };
+    pending = { raw, hash: keccak256(raw), creationDataHash: keccak256(data),
+      address: canonical ?? getContractAddress({ from: account.address, nonce: BigInt(nonce) }) };
     state.contracts[name] = { pending }; await saveJson(stateFile, state);
   }
+  assert.equal(pending.creationDataHash, keccak256(data), 'Pending deployment intent changed');
   let receipt = await client.getTransactionReceipt({ hash: pending.hash }).catch(() => null);
   if (!receipt) {
     try { await client.sendRawTransaction({ serializedTransaction: pending.raw }); }
     catch (error) { if (!/already known|nonce too low/i.test(error.message)) throw error; }
-    receipt = await client.waitForTransactionReceipt({ hash: pending.hash, confirmations: 18, timeout: 180_000 });
   }
+  receipt = await client.waitForTransactionReceipt({ hash: pending.hash, confirmations: 18, timeout: 180_000 });
   assert.equal(receipt.status, 'success', name + ' reverted; inspect before retrying');
   const deployed = await client.getCode({ address: pending.address });
   assert(deployed && deployed !== '0x', 'Missing deployed code');
