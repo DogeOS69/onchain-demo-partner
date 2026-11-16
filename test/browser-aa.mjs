@@ -35,7 +35,15 @@ await page.exposeBinding('testWalletRequest', async (_, { method, params = [] })
   if (method === 'net_version') return '6281971';
   if (method === 'wallet_switchEthereumChain' || method === 'wallet_addEthereumChain') return null;
   if (method === 'wallet_requestPermissions' || method === 'wallet_getPermissions') { connected = true; return [{ parentCapability: 'eth_accounts' }]; }
-  if (method === 'personal_sign') { if (rejectSignature) { rejectSignature = false; throw Object.assign(new Error('User rejected signature'), { code: 4001 }); } assert(/^0x[0-9a-f]{64}$/i.test(params[0])); assert.equal(params[1].toLowerCase(), owner.address.toLowerCase()); return owner.signMessage({ message: { raw: params[0] } }); }
+  if (method === 'eth_signTypedData_v4') {
+    if (rejectSignature) { rejectSignature = false; throw Object.assign(new Error('User rejected signature'), { code: 4001 }); }
+    assert.equal(params[0].toLowerCase(), owner.address.toLowerCase());
+    const data = typeof params[1] === 'string' ? JSON.parse(params[1]) : params[1];
+    assert.equal(data.domain.chainId, manifest.chainId);
+    assert.equal(data.domain.verifyingContract.toLowerCase(), manifest.entryPoint.toLowerCase());
+    assert.equal(data.primaryType, 'PackedUserOperation');
+    return owner.signTypedData(data);
+  }
   if (method === 'eth_sendTransaction') {
     if (rejectFunding) { rejectFunding = false; throw Object.assign(new Error('User rejected funding'), { code: 4001 }); }
     const tx = params[0];
@@ -47,7 +55,7 @@ await page.exposeBinding('testWalletRequest', async (_, { method, params = [] })
     funded += value;
     return wallet.sendTransaction({ to: account, value });
   }
-  if (['eth_signTransaction','eth_sendRawTransaction'].includes(method)) throw new Error('Unexpected wallet request');
+  if (['personal_sign','eth_signTransaction','eth_sendRawTransaction'].includes(method)) throw new Error('Unexpected wallet request');
   return rpc.request({ method, params });
 });
 await page.addInitScript(() => {
@@ -77,7 +85,7 @@ await page.getByRole('button', { name: 'Prepare increment', exact: true }).click
 const addFunds = page.getByRole('button', { name: /^Add .* DOGE from wallet$/ });
 await addFunds.waitFor({ timeout: 90000 });
 await page.screenshot({ path: 'test/results/aa-fee-preview.png', fullPage: true });
-assert(!methods.includes('personal_sign'));
+assert(!methods.includes('eth_signTypedData_v4'));
 await addFunds.click();
 await page.getByRole('alert').filter({ hasText: 'Wallet request cancelled.' }).waitFor();
 await addFunds.click();
@@ -122,5 +130,5 @@ assert.equal(accountBefore + funded - await rpc.getBalance({ address: account })
 await mkdir('test/results', { recursive: true });
 await writeFile('test/results/browser-aa.json', JSON.stringify({ base, owner: owner.address, account, salt: 0, count, transactionUrl, errors,
   userChargeWei: String(event.args.actualGasCost), networkFeeWei: String(networkFee), l1FeeWei: String(BigInt(raw.l1Fee)), fundedWei: String(funded), accountBeforeWei: String(accountBefore),
-  personalSignCount: methods.filter(m => m === 'personal_sign').length, ownerTransactionRequests: methods.filter(m => ['eth_sendTransaction','eth_signTransaction','eth_sendRawTransaction'].includes(m)), reloadRecovered: true, reconnectedAfterReload, sharedSdkConnection: true, fundingCancellationRecovered: true, signatureCancellationRecovered: true }, null, 2));
+  entryPointVersion: '0.9', typedDataSignCount: methods.filter(m => m === 'eth_signTypedData_v4').length, ownerTransactionRequests: methods.filter(m => ['eth_sendTransaction','eth_signTransaction','eth_sendRawTransaction'].includes(m)), reloadRecovered: true, reconnectedAfterReload, sharedSdkConnection: true, fundingCancellationRecovered: true, signatureCancellationRecovered: true }, null, 2));
 await browser.close(); assert.equal(errors.length, 0, errors.join('\n')); console.log(`PASS: SDK wallet → funded smart account → self-paid counter ${count} → reload recovery; ${transactionUrl}`);

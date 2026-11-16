@@ -24,3 +24,4 @@ contracts/lib/
 !.env.example
 
 **/*.tsbuildinfo
+aa/artifacts/

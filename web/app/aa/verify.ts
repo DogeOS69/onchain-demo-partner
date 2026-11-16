@@ -1,6 +1,6 @@
 import { createPublicClient, encodeFunctionData, formatEther, http, keccak256, parseAbi,
   parseEther, parseEventLogs, zeroAddress, type Address, type Hex } from 'viem';
-import { getUserOperationHash } from 'viem/account-abstraction';
+import { getUserOperationHash, getUserOperationTypedData } from 'viem/account-abstraction';
 import deployment from './deployment.json';
 import { dogeosChain } from '../chain';
 export const manifest = deployment;
@@ -16,6 +16,11 @@ const counter = parseAbi(['function increment()', 'function counts(address) view
 const entry = parseAbi(['function getNonce(address,uint192) view returns (uint256)', 'function balanceOf(address) view returns (uint256)', 'event UserOperationEvent(bytes32 indexed userOpHash,address indexed sender,address indexed paymaster,uint256 nonce,bool success,uint256 actualGasCost,uint256 actualGasUsed)']);
 export const same = (a?: string | null, b?: string | null) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
 function ensure(value: unknown, message: string): asserts value { if (!value) throw new Error(message); }
+export async function verifyNetwork() {
+  ensure(await rpc.getChainId() === manifest.chainId &&
+    same((await rpc.getBlock({ blockNumber: 0n })).hash, manifest.genesisHash),
+  'Wrong network. Devnet and Chikyū share a chain ID; check the RPC URL.');
+}
 export function maxCost(op: Operation['userOperation']) {
   return (BigInt(op.verificationGasLimit) + BigInt(op.callGasLimit) + BigInt(op.preVerificationGas)) * BigInt(op.maxFeePerGas);
 }
@@ -30,9 +35,21 @@ export function hashOf(op: Operation['userOperation']) {
   const value: Record<string, unknown> = { ...op };
   for (const key of ['nonce','verificationGasLimit','callGasLimit','preVerificationGas','maxFeePerGas','maxPriorityFeePerGas']) value[key] = BigInt(op[key]);
   return getUserOperationHash({ chainId: manifest.chainId, entryPointAddress: manifest.entryPoint as Address,
-    entryPointVersion: '0.7', userOperation: value as never });
+    entryPointVersion: '0.9', userOperation: value as never });
+}
+export function typedDataOf(op: Operation['userOperation']) {
+  const value: Record<string, unknown> = { ...op };
+  for (const key of ['nonce','verificationGasLimit','callGasLimit','preVerificationGas','maxFeePerGas','maxPriorityFeePerGas']) value[key] = BigInt(op[key]);
+  const data = getUserOperationTypedData({ chainId: manifest.chainId,
+    entryPointAddress: manifest.entryPoint as Address, userOperation: value as never });
+  return { ...data, types: { EIP712Domain: [
+    { name: 'name', type: 'string' }, { name: 'version', type: 'string' },
+    { name: 'chainId', type: 'uint256' }, { name: 'verifyingContract', type: 'address' },
+  ], ...data.types } };
 }
 export async function verifyIntent(result: Operation, owner: Address) {
+  ensure(manifest.entryPointVersion === '0.9', 'EntryPoint v0.9 deployment is pending.');
+  await verifyNetwork();
   const op = result.userOperation;
   ensure(result.chainId === 6281971 && await rpc.getChainId() === 6281971 && same(result.owner, owner), 'Wallet or network changed.');
   ensure(same(result.counter, manifest.counter), 'Counter configuration changed.');

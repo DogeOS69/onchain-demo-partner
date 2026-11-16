@@ -26,7 +26,7 @@ export async function launchAlto({ manifest, executorPrivateKey, stateDir, port 
     'executor-private-keys': executorPrivateKey, 'utility-private-key': executorPrivateKey,
     'refilling-wallets': false, 'deploy-simulations-contract': false,
     'pimlico-simulation-contract': manifest.pimlicoSimulations,
-    'entrypoint-simulation-contract-v7': manifest.entryPointSimulations,
+    'entrypoint-simulation-contract-v9': manifest.entryPointSimulations,
     'safe-mode': false, 'eip-7702-support': false, 'enable-debug-endpoints': false,
     // Use the network gas price; data-fee reimbursement must not inflate the L2 tip.
     'skip-local-gas-calculations': true,

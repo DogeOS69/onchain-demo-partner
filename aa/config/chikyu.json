@@ -1,5 +1,6 @@
 {
   "chainId": 6281971,
+  "genesisHash": "0xf9f7c524dce38b51a4d28ec2f18680773e5ba9d3f5f430d0e05f92cfeb65b1bc",
   "rpcUrl": "https://rpc.testnet.dogeos.com",
   "explorerUrl": "https://dogeos-testnet.l2scan.co",
   "entryPointVersion": "0.7",

@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useAccount, useConnectors, useWalletConnect } from '@dogeos/dogeos-sdk';
-import { formatEther, numberToHex, parseEther, recoverMessageAddress, type Address, type Hex } from 'viem';
-import { accountInfo, api, manifest, maxCost, rpc, same, verifyIntent, verifyReceipt, type Operation } from './verify';
+import { formatEther, numberToHex, parseEther, recoverAddress, type Address, type Hex } from 'viem';
+import { accountInfo, api, manifest, maxCost, rpc, same, typedDataOf, verifyIntent, verifyReceipt, type Operation } from './verify';
 const active = (op?: Operation | null) => !!op && ['submitted','included'].includes(op.status);
 const key = (owner: string) => `aa-counter:${manifest.chainId}:${manifest.accountFactory}:0:${owner.toLowerCase()}`;
 type Info = Awaited<ReturnType<typeof accountInfo>>;
@@ -69,6 +69,8 @@ export default function Page() {
         const accounts = await provider.request({ method: 'eth_accounts' }) as string[];
         if (!same(ownerRef.current, owner) || !same(accounts[0], owner)) throw new Error('Wallet changed. Prepare again.');
         if (Number(await provider.request({ method: 'eth_chainId' })) !== manifest.chainId) throw new Error('Switch your wallet to Chikyū.');
+        const genesis = await provider.request({ method: 'eth_getBlockByNumber', params: ['0x0', false] }) as { hash: string };
+        if (!same(genesis?.hash, manifest.genesisHash)) throw new Error('Switch to the Chikyū testnet RPC. Devnet uses the same chain ID.');
       };
       await checkWallet();
       if (!op || !preview) throw new Error('Prepare an increment first.');
@@ -89,8 +91,9 @@ export default function Page() {
       }
       if (current.available < cost) throw new Error('Add DOGE to your smart account first.');
       await checkWallet(); setBusy('Sign in your wallet…');
-      const signature = await provider.request({ method: 'personal_sign', params: [op.userOpHash, owner] }) as Hex;
-      if (!same(await recoverMessageAddress({ message: { raw: op.userOpHash }, signature }), owner)) throw new Error('Wallet returned an invalid signature.');
+      const payload = JSON.stringify(typedDataOf(op.userOperation), (_, value) => typeof value === 'bigint' ? value.toString() : value);
+      const signature = await provider.request({ method: 'eth_signTypedData_v4', params: [owner, payload] }) as Hex;
+      if (!same(await recoverAddress({ hash: op.userOpHash, signature }), owner)) throw new Error('Wallet returned an invalid signature.');
       await checkWallet(); setBusy('Submitting…');
       // Persist the ID before broadcasting; lost responses must recover this exact operation.
       setOp({ ...op, status: 'submitted' });
@@ -101,6 +104,7 @@ export default function Page() {
     } finally { setBusy(''); busyRef.current = false; }
   }
   const status = verifiedCount ? 'Confirmed on Chikyū.' : op?.status === 'included' ? `Included · ${op.confirmations}/18 confirmations` : op?.status === 'submitted' ? 'Waiting for the account transaction…' : op?.status === 'failed' ? op.failure : expired && op?.status === 'prepared' ? 'Fee preview expired. Prepare again.' : '';
+  if (manifest.entryPointVersion !== '0.9') return <section className="card"><h1>Account abstraction · v0.9</h1><p>The v0.9 contracts are awaiting deployment on Chikyū. Transactions will be enabled once the deployment is verified.</p></section>;
   return <section className="card"><h1>Account abstraction</h1><p>Increment a counter from your smart account. Your smart account pays gas in DOGE.</p>
     {info && <dl><dt>Your smart account</dt><dd><a href={`${manifest.explorerUrl}/address/${info.address}`} target="_blank" rel="noreferrer">{info.address}</a></dd><dt>Available for gas</dt><dd>{formatEther(info.available)} DOGE</dd></dl>}
     {preview && <p className="status">Maximum gas charge: <strong>{formatEther(cost)} DOGE</strong>. Includes the DogeOS data fee and a fee buffer. Any unused prefund stays available to your account.</p>}
@@ -114,6 +118,6 @@ export default function Page() {
     {verifiedCount && <div className="result"><div className="result-label">Your smart account’s counter</div><div className="result-value">{verifiedCount}</div><p>Gas paid by your account: {op?.userChargeDoge} DOGE</p></div>}
     {op?.transactionHash && <a href={`${manifest.explorerUrl}/tx/${op.transactionHash}`} target="_blank" rel="noreferrer">View transaction ↗</a>}
     <details><summary>How it works &amp; contract details</summary><p>Your SDK wallet controls a SimpleAccount derived with salt 0. Add test DOGE to that address, then sign an ERC-4337 UserOperation to increment the counter. The first operation also deploys the account. The bundler submits the transaction and receives its gas payment from your account.</p>
-      <dl><dt>Owner wallet</dt><dd>{address ?? 'Connect your wallet'}</dd><dt>Factory · salt 0</dt><dd>{manifest.accountFactory}</dd><dt>EntryPoint · v0.7</dt><dd>{manifest.entryPoint}</dd><dt>Counter</dt><dd>{manifest.counter}</dd>{op && <><dt>UserOperation</dt><dd>{op.userOpHash}</dd></>}{op?.networkFeeDoge && <><dt>Total network fee</dt><dd>{op.networkFeeDoge} DOGE</dd><dt>Account gas charge</dt><dd>{op.userChargeDoge} DOGE</dd><dt>DogeOS data fee</dt><dd>{op.l1DataFeeDoge} DOGE</dd></>}</dl>
+      <dl><dt>Owner wallet</dt><dd>{address ?? 'Connect your wallet'}</dd><dt>Factory · salt 0</dt><dd>{manifest.accountFactory}</dd><dt>EntryPoint · v0.9</dt><dd>{manifest.entryPoint}</dd><dt>Counter</dt><dd>{manifest.counter}</dd>{op && <><dt>UserOperation</dt><dd>{op.userOpHash}</dd></>}{op?.networkFeeDoge && <><dt>Total network fee</dt><dd>{op.networkFeeDoge} DOGE</dd><dt>Account gas charge</dt><dd>{op.userChargeDoge} DOGE</dd><dt>DogeOS data fee</dt><dd>{op.l1DataFeeDoge} DOGE</dd></>}</dl>
     </details></section>;
 }

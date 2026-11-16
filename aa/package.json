@@ -9,16 +9,16 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "start": "node server.mjs",
-    "postinstall": "node scripts/patch-alto.mjs"
+    "build:contracts": "node scripts/build-contracts.mjs",
+    "postinstall": "node scripts/build-contracts.mjs && node scripts/patch-alto.mjs"
   },
   "dependencies": {
-    "@account-abstraction/contracts": "0.7.0",
-    "@openzeppelin/contracts": "5.0.2",
+    "@openzeppelin/contracts": "5.4.0",
     "@pimlico/alto": "0.0.21",
-    "viem": "2.57.18"
+    "viem": "2.57.18",
+    "solc": "0.8.28"
   },
   "devDependencies": {
-    "@foundry-rs/anvil": "1.7.1",
-    "solc": "0.8.28"
+    "@foundry-rs/anvil": "1.7.1"
   }
 }

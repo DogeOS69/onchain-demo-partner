@@ -5,14 +5,15 @@ import { createServer } from 'node:net';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createPublicClient, createWalletClient, defineChain, encodeFunctionData,
-  http, numberToHex, parseEther, parseEventLogs, zeroAddress } from 'viem';
+import { concat, createPublicClient, createWalletClient, defineChain, encodeFunctionData,
+  http, keccak256, numberToHex, parseEther, parseEventLogs, zeroAddress } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import solc from 'solc';
 import { accountAbi, accountSalt, artifact, counterAbi, factoryAbi } from '../lib/chain.mjs';
-import { checkIntent, factoryCall, incrementCall, limits, maxCost, operationHash, packOperation, verifyOwner } from '../lib/user-operation.mjs';
+import { checkIntent, factoryCall, incrementCall, limits, maxCost, operationHash, operationTypedData, packOperation, verifyOwner } from '../lib/user-operation.mjs';
 import { launchAlto } from '../lib/alto.mjs';
 import { createEngine } from '../lib/engine.mjs';
+import { arachnid, arachnidRuntime, canonicalEntryPoint, entryPointCodeHashes, entryPointSalt } from '../lib/deployment.mjs';
 
 let anvil, client, wallet, admin, entry, factory, manifest, counter, localRpc;
 const chain = defineChain({ id: 31337, name: 'Isolated test', fees: { defaultPriorityFee: 100n }, nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: { default: { http: [] } } });
@@ -46,10 +47,14 @@ before(async () => {
   const compiled = JSON.parse(solc.compile(JSON.stringify({ language: 'Solidity', sources: { 'C.sol': { content: source } }, settings: { evmVersion: 'cancun', outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object'] } } } })));
   const c = compiled.contracts['C.sol'].Counter;
   counter = await deploy({ abi: c.abi, bytecode: `0x${c.evm.bytecode.object}` });
-  const ep = await deploy(entry);
+  await client.request({ method: 'anvil_setCode', params: [arachnid, arachnidRuntime] });
+  const entryDeployment = await wallet.sendTransaction({ to: arachnid, data: concat([entryPointSalt, entry.bytecode]), ...testFees });
+  await client.waitForTransactionReceipt({ hash: entryDeployment });
+  const ep = canonicalEntryPoint;
+  assert.equal(keccak256(await client.getCode({ address: ep })), entryPointCodeHashes[31337]);
   const fac = await deploy(factory, [ep]);
   const implementation = await client.readContract({ address: fac, abi: factory.abi, functionName: 'accountImplementation' });
-  manifest = { chainId: 31337, entryPoint: ep, accountFactory: fac, counter, accountImplementation: implementation };
+  manifest = { chainId: 31337, entryPointVersion: '0.9', entryPoint: ep, accountFactory: fac, counter, accountImplementation: implementation };
 
 });
 
@@ -63,7 +68,7 @@ async function makeOperation({ accountOwner = owner } = {}) {
     ...(code && code !== '0x' ? {} : { factory: manifest.accountFactory, factoryData: factoryCall(accountOwner.address) }),
     callData: incrementCall(counter), verificationGasLimit: '0x7a120', callGasLimit: '0x186a0', preVerificationGas: '0x186a0',
     maxFeePerGas: '0x5f5e100', maxPriorityFeePerGas: '0x5f5e100', signature: '0x' };
-  op.signature = await accountOwner.signMessage({ message: { raw: operationHash(op, manifest) } });
+  op.signature = await accountOwner.signTypedData(operationTypedData(op, manifest));
   return op;
 }
 async function fund(address, value = parseEther('0.1')) {
@@ -118,9 +123,21 @@ test('the demo rejects changed intent, another salt, a paymaster and excessive c
 
 test('only the owner signature can execute the account', async () => {
   const op = await makeOperation();
-  op.signature = await privateKeyToAccount(generatePrivateKey()).signMessage({ message: { raw: operationHash(op, manifest) } });
+  op.signature = await privateKeyToAccount(generatePrivateKey()).signTypedData(operationTypedData(op, manifest));
   await assert.rejects(verifyOwner(operationHash(op, manifest), op.signature, owner.address));
   await assert.rejects(execute(op));
+  op.signature = await owner.signMessage({ message: { raw: operationHash(op, manifest) } });
+  await assert.rejects(verifyOwner(operationHash(op, manifest), op.signature, owner.address), 'old personal_sign signatures are not v0.9 signatures');
+  await assert.rejects(execute(op));
+  op.signature = await owner.signTypedData(operationTypedData(op, { ...manifest, chainId: 1 }));
+  await assert.rejects(verifyOwner(operationHash(op, manifest), op.signature, owner.address), 'typed signatures bind the chain');
+  await assert.rejects(execute(op));
+});
+
+test('the final v0.9 factory prevents direct account-creation front-running', async () => {
+  const fresh = privateKeyToAccount(generatePrivateKey());
+  await assert.rejects(client.simulateContract({ account: admin, address: manifest.accountFactory,
+    abi: factory.abi, functionName: 'createAccount', args: [fresh.address, 0n] }));
 });
 
 test('Alto estimates and includes a real self-funded UserOperation; recovery does not send twice', { timeout: 45_000 }, async () => {
@@ -135,7 +152,7 @@ test('Alto estimates and includes a real self-funded UserOperation; recovery doe
       return (await client.waitForTransactionReceipt({ hash })).contractAddress;
     };
     const pimlicoSimulations = await deploy(new URL('../node_modules/@pimlico/alto/esm/contracts/PimlicoSimulations.sol/PimlicoSimulations.json', import.meta.url));
-    const entryPointSimulations = await deploy(new URL('../node_modules/@pimlico/alto/esm/contracts/EntryPointSimulations.sol/EntryPointSimulations07.json', import.meta.url));
+    const entryPointSimulations = await deploy(new URL('../node_modules/@pimlico/alto/esm/contracts/EntryPointSimulations.sol/EntryPointSimulations09.json', import.meta.url));
     const implementation = await client.readContract({ address: manifest.accountFactory, abi: factory.abi, functionName: 'accountImplementation' });
     const local = { ...manifest, rpcUrl: localRpc, explorerUrl: 'http://localhost', accountImplementation: implementation,
       pimlicoSimulations, entryPointSimulations };
@@ -152,8 +169,8 @@ test('Alto estimates and includes a real self-funded UserOperation; recovery doe
     assert.equal(prepared.userOperation.paymaster, undefined);
     assert.equal(packOperation(prepared.userOperation).paymasterAndData, '0x');
     assert.equal(await client.getBalance({ address: testOwner.address }), 0n);
-    const signature = await testOwner.signMessage({ message: { raw: prepared.userOpHash } });
-    await assert.rejects(engine.submit(prepared.id, await owner.signMessage({ message: { raw: prepared.userOpHash } })));
+    const signature = await testOwner.signTypedData(operationTypedData(prepared.userOperation, local));
+    await assert.rejects(engine.submit(prepared.id, await owner.signTypedData(operationTypedData(prepared.userOperation, local))));
     await assert.rejects(engine.submit(prepared.id, signature), /Add DOGE/);
     await fund(prepared.account);
     const accountBefore = await available(prepared.account);
@@ -187,7 +204,7 @@ test('Alto estimates and includes a real self-funded UserOperation; recovery doe
     const recovery = await createEngine({ manifest: local, executor: admin.address,
       rpc: rejectRpc, stateDir: dir, client, requiredConfirmations: 3 });
     const expired = await recovery.prepare(testOwner.address);
-    await recovery.submit(expired.id, await testOwner.signMessage({ message: { raw: expired.userOpHash } }));
+    await recovery.submit(expired.id, await testOwner.signTypedData(operationTypedData(expired.userOperation, local)));
     await new Promise(resolve => setTimeout(resolve, 150));
     await client.request({ method: 'evm_increaseTime', params: [310] });
     await client.request({ method: 'evm_mine', params: [] });
@@ -204,7 +221,7 @@ test('Alto estimates and includes a real self-funded UserOperation; recovery doe
       rpc: bundler.rpc, stateDir: dir, client, requiredConfirmations: 1 });
     assert.equal((await recovered.prepare(testOwner.address)).id, expired.id);
     // Its original signature is still valid and the exact operation can recover.
-    await execute({ ...expired.userOperation, signature: await testOwner.signMessage({ message: { raw: expired.userOpHash } }) });
+    await execute({ ...expired.userOperation, signature: await testOwner.signTypedData(operationTypedData(expired.userOperation, local)) });
     await recovered.tick();
     assert.equal(recovered.status(expired.id).status, 'confirmed');
     assert.equal(recovered.status(expired.id).counterAfter, '2');

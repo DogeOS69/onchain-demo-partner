@@ -8,6 +8,7 @@ import { chainId, json, readJson, root, rpcUrl, safeError } from './lib/chain.mj
 import { ApiError } from './lib/user-operation.mjs';
 
 const manifest = await readJson(resolve(root, 'config/chikyu.json'));
+assert.equal(manifest.entryPointVersion, '0.9', 'Run the v0.9 deployment script before starting this backend');
 assert(manifest.chainId === chainId && manifest.rpcUrl === rpcUrl, 'This server only serves Chikyu');
 const stateDir = resolve(process.env.AA_STATE_DIR ?? resolve(root, '.runtime'));
 const keys = process.env.BUNDLER_EXECUTOR_PRIVATE_KEY ? {

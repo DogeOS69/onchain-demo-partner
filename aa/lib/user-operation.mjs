@@ -1,6 +1,6 @@
 import { concat, encodeFunctionData, formatEther, getAddress, isAddress,
-  numberToHex, recoverMessageAddress, zeroAddress } from 'viem';
-import { getUserOperationHash } from 'viem/account-abstraction';
+  numberToHex, recoverAddress, zeroAddress } from 'viem';
+import { getUserOperationHash, getUserOperationTypedData } from 'viem/account-abstraction';
 import { accountAbi, counterAbi, accountSalt, factoryAbi, same } from './chain.mjs';
 
 export const limits = Object.freeze({ maxGas: 1_500_000n, maxFeePerGas: 500_000_000n,
@@ -37,13 +37,19 @@ export function packOperation(op) {
     paymasterAndData: '0x', signature: op.signature ?? '0x',
   };
 }
-export function operationHash(op, manifest) {
+export function operationTypedData(op, manifest) {
   requireSelfPayment(op);
   const value = { ...op };
   for (const field of ['nonce', 'verificationGasLimit', 'callGasLimit', 'preVerificationGas', 'maxFeePerGas', 'maxPriorityFeePerGas']) value[field] = BigInt(value[field]);
   if (!value.factory) { delete value.factory; delete value.factoryData; }
+  return getUserOperationTypedData({ chainId: manifest.chainId, entryPointAddress: manifest.entryPoint, userOperation: value });
+}
+export function operationHash(op, manifest) {
+  requireSelfPayment(op);
+  const value = { ...op };
+  for (const field of ['nonce', 'verificationGasLimit', 'callGasLimit', 'preVerificationGas', 'maxFeePerGas', 'maxPriorityFeePerGas']) value[field] = BigInt(value[field]);
   return getUserOperationHash({ chainId: manifest.chainId, entryPointAddress: manifest.entryPoint,
-    entryPointVersion: '0.7', userOperation: value });
+    entryPointVersion: '0.9', userOperation: value });
 }
 export function checkIntent(op, owner, manifest) {
   requireSelfPayment(op);
@@ -61,7 +67,7 @@ export async function verifyOwner(hash, signature, owner) {
   const v = parseInt(signature.slice(130), 16);
   if (s > 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0n || ![27, 28].includes(v))
     throw new ApiError(400, 'Noncanonical wallet signature.');
-  const signer = await recoverMessageAddress({ message: { raw: hash }, signature }).catch(() => null);
+  const signer = await recoverAddress({ hash, signature }).catch(() => null);
   if (!same(signer, owner)) throw new ApiError(400, 'The connected wallet did not sign this operation.');
 }
 export function publicOperation(value) {

@@ -1,7 +1,8 @@
 FROM node:24-bookworm-slim
 WORKDIR /app
 COPY --chown=node:node package.json package-lock.json ./
-COPY --chown=node:node scripts/patch-alto.mjs ./scripts/patch-alto.mjs
+COPY --chown=node:node scripts ./scripts
+COPY --chown=node:node vendor ./vendor
 RUN npm ci --omit=dev --no-audit --no-fund
 COPY --chown=node:node lib ./lib
 COPY --chown=node:node config ./config

@@ -2,26 +2,27 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { formatEther, getAddress, keccak256, numberToHex, parseEventLogs, zeroAddress } from 'viem';
-import { accountAbi, accountSalt, artifact, counterAbi, factoryAbi, feeOracle, json,
+import { accountAbi, accountSalt, artifact, assertNetwork, counterAbi, factoryAbi, feeOracle, json,
   oracleAbi, readJson, reader, same, saveJson, safeError } from './chain.mjs';
 import { ApiError, checkIntent, executionGas, factoryCall, incrementCall, limits, maxCost,
   operationHash, ownerAddress, packOperation, publicOperation, stubSignature, verifyOwner } from './user-operation.mjs';
 
 import { bundleEnvelope, oraclePayload } from './data-fee.mjs';
 
-const feeModel = 'chikyu-zstd-v1';
+const feeModel = 'chikyu-zstd-ep09-v1';
 const implementationSlot = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
 const activeStates = ['submitted', 'included'];
 
 export async function createEngine({ manifest, executor, rpc, stateDir,
   client = reader(), requiredConfirmations = 18 }) {
-  assert.equal(await client.getChainId(), manifest.chainId, 'Wrong chain');
+  await assertNetwork(client, manifest);
+  assert.equal(manifest.entryPointVersion, '0.9', 'EntryPoint v0.9 is required');
   const entry = await artifact('EntryPoint');
   for (const contract of Object.values(manifest.contracts ?? {})) {
     assert.equal(keccak256(await client.getCode({ address: contract.address })), contract.runtimeCodeHash,
       'A configured contract has different code');
   }
-  const path = resolve(stateDir, 'aa-operations-v1.private.json');
+  const path = resolve(stateDir, 'aa-operations-09.private.json');
   const db = await readJson(path, { version: 1, chainId: manifest.chainId, entryPoint: manifest.entryPoint,
     accountFactory: manifest.accountFactory, accountSalt: String(accountSalt), operations: {} });
   assert(db.chainId === manifest.chainId && same(db.entryPoint, manifest.entryPoint)
@@ -81,7 +82,7 @@ export async function createEngine({ manifest, executor, rpc, stateDir,
   }
   async function config() {
     return { chainId: manifest.chainId, chainName: 'DogeOS Chikyu', rpcUrl: manifest.rpcUrl,
-      explorerUrl: manifest.explorerUrl, entryPoint: manifest.entryPoint, entryPointVersion: '0.7',
+      explorerUrl: manifest.explorerUrl, entryPoint: manifest.entryPoint, entryPointVersion: '0.9',
       accountFactory: manifest.accountFactory, accountSalt: String(accountSalt), counter: manifest.counter,
       executor, operationsEnabled: await client.getBalance({ address: executor }) >= limits.maxCost,
       requiredConfirmations, funding: 'account' };
