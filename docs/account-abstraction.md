@@ -1,12 +1,16 @@
 # Account abstraction on Chikyū
 
-The [hosted example](https://partner-demos-lab.up.railway.app/aa) uses ERC-4337 EntryPoint v0.7, SimpleAccount and Alto. The connected DogeOS SDK wallet owns the smart account. Its address is derived from that owner and **salt `0`** using the pinned factory. The user adds test DOGE to that address and signs an operation that increments a counter. The smart account pays the gas, including account deployment on its first operation and the DogeOS data fee.
+This branch targets canonical **EntryPoint v0.9**, aligned with DogeOS preinstalls v0.2.2. The [hosted example](https://partner-demos-lab.up.railway.app/aa) remains on v0.7 until the funded testnet rollout described in [entrypoint-09.md](entrypoint-09.md) is completed. The branch fails closed while its manifest still records v0.7.
+
+The connected DogeOS SDK wallet owns the smart account. Its address is derived from that owner and **salt `0`** using the pinned factory. The user adds test DOGE to that address and signs an operation that increments a counter. The smart account pays the gas, including account deployment on its first operation and the DogeOS data fee.
 
 The scope is account abstraction with user-paid gas. There is no paymaster, sponsor signing key, sponsored quota or EIP-7702 authorization. The former `/sponsorship` page redirects to `/aa`. Accounts created with the previous salt keep their addresses and balances; this change does not migrate their assets.
 
 ## Contracts and SDK
 
 Chain ID: `6281971`. RPC: `https://rpc.testnet.dogeos.com`. The [deployment manifest](../aa/config/chikyu.json) pins addresses and runtime hashes. The browser has a reviewed copy in [deployment.json](../web/app/aa/deployment.json).
+
+The following are the last verified **v0.7 live deployment** addresses. The v0.9 target is `0x433709009B8330FDa32311DF1C2AFA402eD8D009`; the new factory and account implementation are recorded by the deployment script after confirmation.
 
 | Contract | Address |
 | --- | --- |
@@ -15,14 +19,14 @@ Chain ID: `6281971`. RPC: `https://rpc.testnet.dogeos.com`. The [deployment mani
 | SimpleAccount implementation | `0x30aACD0f45bc25878b264baf36A83858a2169ba0` |
 | Counter | `0x935b84fc676958daf32ce333302f3b396bb4b7cb` |
 
-This EntryPoint has a custom address. Configure it explicitly when using a compatible bundler. Salt alone does not determine interoperability: the owner, factory and account initialization must also agree. The SDK supplies the connected EVM provider and wallet signature; this example implements the ERC-4337 flow around it.
+The old EntryPoint has a custom address; the new one uses its canonical CREATE2 address. Configure the chosen EntryPoint and version explicitly in the bundler and SDK. Salt alone does not determine interoperability: the owner, factory and account initialization must also agree. Changing the factory changes the smart-account address and does not move existing assets.
 
 ## Flow and fees
 
 1. Connect the SDK wallet. The browser derives the salt-0 smart account and reads its native DOGE balance plus its own EntryPoint deposit.
 2. `POST /api/aa/prepare` with `{ "owner": "0x…" }` prepares the fixed counter action. A simulation-only balance override allows a preview before funding; it transfers no funds.
 3. Review the maximum gas charge. If needed, the funding button asks the owner's wallet to transfer DOGE to its smart account. It rounds the shortfall up to 0.01 DOGE. Users can also send DOGE directly to the displayed account address.
-4. The browser verifies the account, factory, counter calldata, nonce, gas limits and operation hash before `personal_sign`. It posts only `{ id, signature }` to `/api/aa/submit`.
+4. The browser verifies the account, factory, counter calldata, nonce, gas limits, genesis hash and operation hash before `eth_signTypedData_v4` (EIP-712). It posts only `{ id, signature }` to `/api/aa/submit`. Old `personal_sign` signatures are rejected.
 5. The service checks real account funds before broadcasting. Poll `/api/aa/operations/:id` for the exact operation. Success requires the EntryPoint event, a zero paymaster, the counter event/state and 18 confirmations. The browser independently verifies the receipt and actual account charge.
 
 The account's native balance funds any missing EntryPoint prefund. Unused prefund remains in that account's EntryPoint deposit and is available to later operations. The owner's EOA pays only for its explicit funding transfer; the smart account pays for the UserOperation.
@@ -35,7 +39,7 @@ Prepared previews expire after five minutes. **A submitted SimpleAccount signatu
 
 ## Run and deploy
 
-Use Node.js 24 or later (the backend uses native zstd compression).
+Use Node.js 24 or later (the backend uses native zstd compression). Complete the v0.9 contract deployment in [entrypoint-09.md](entrypoint-09.md) before starting or publishing this branch.
 
 ```bash
 npm --prefix aa ci
@@ -56,4 +60,4 @@ The backend tests run a real Anvil chain and Alto process: salt-0 derivation, fa
 
 For the real testnet browser flow, install root dependencies and Chromium, build the web app with a registered client ID and `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=false`, then set `WEB_URL` and `TEST_KEY_FILE` to a private JSON containing a dedicated test owner's `privateKey`, fund that owner's EOA with enough test DOGE for the displayed maximum and its funding transfer, then run `npm run test:browser:aa`. It uses the actual SDK picker with an injected test provider, approves a bounded funding transfer and signs one UserOperation. Signing stays in the Node test runner. It verifies account payment of the full network fee, zero paymaster, reload recovery and the shared SDK connection. For testing against the published backend, a local web build can proxy to `AA_API_URL=https://partner-demos-lab.up.railway.app/api/aa`. The public deployment uses Google/X login; this browser test does not complete OAuth or exercise a human wallet extension.
 
-Historical results for the previous sponsored implementation remain in `docs/validation.json`; they do not describe the current payment flow. Current release evidence is recorded separately in `docs/aa-validation.json`.
+Historical results for the previous sponsored implementation remain in `docs/validation.json`. `docs/aa-validation.json` records the hosted self-paid **v0.7** run, not a v0.9 network proof. The v0.9 local tests and pending rollout are documented in `docs/entrypoint-09.md`.
