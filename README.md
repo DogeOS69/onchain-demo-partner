@@ -2,7 +2,7 @@
 
 Integrate DogeOS quests using onchain smart contract events or actions verified by your backend. This guide covers both integrations, the local demo, the partner API, and the move from staging to production.
 
-**Demo:** [dogeos-demos.vercel.app](https://dogeos-demos.vercel.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Account Abstraction. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`. The previous [Railway deployment](https://partner-demos-lab.up.railway.app) remains available. Social login on Vercel requires registering its origin with the SDK client; see the [deployment status](docs/aa-aws-vercel.md#deployment-status).
+**Demo:** [dogeos-demos.vercel.app](https://dogeos-demos.vercel.app). Four small examples share one DogeOS SDK connection: External Rule, Onchain Rule, Randomness, and Account Abstraction. The web app pins SDK `4.1.0`, Next.js `15.5.29`, and React `19.0.9`. Google/X authentication starts successfully on the registered Vercel origin; see the [deployment status](docs/aa-aws-vercel.md#deployment-status).
 
 The hosted AA demo uses canonical EntryPoint v0.9 and a SimpleAccount derived with salt `0`. The user funds that account with DOGE and it pays for its operations, including the DogeOS data fee. The [v0.9 rollout](docs/entrypoint-09.md) is deployed and verified on Chikyū; see the [validation receipts](docs/aa-validation.json) and [AA setup and provider handoff](docs/account-abstraction.md) for contracts, APIs, costs and limits. Randomness's contracts and keeper are in [randomness/](randomness/README.md).
 

@@ -61,9 +61,13 @@ confirmed receipt survived replacement of the AWS pod. See
 [deployment validation](aa-aws-vercel-validation.json) for the transaction and
 exact verification scope.
 
-Google/X login on the new origin is pending SDK client registration:
-`https://dogeos-demos.vercel.app` must be added to the same project that
-already permits `https://partner-demos-lab.up.railway.app`. Browser checks
-confirmed that the existing origin starts the authentication flow while the
-new origin is rejected by the relay's CORS policy. The previous Railway
-installation is still available.
+The SDK client now accepts `https://dogeos-demos.vercel.app`. Browser checks
+created both Google and X authentication flows with HTTP 200 and reached
+their provider sign-in pages. See [login validation](aa-aws-vercel-login-validation.json).
+Human authentication and the subsequent social-wallet transaction still
+require a user to complete sign-in; the earlier counter proof used the SDK's
+external-wallet provider. External Rule still requires its partner API key
+and quest ID.
+
+The previous Railway installation remains deployed, but its origin currently
+receives HTTP 403 from the SDK preflight. Use the Vercel origin for social login.
