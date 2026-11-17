@@ -32,7 +32,7 @@ characters. Never commit these values. Render the manifests with:
 
 ```bash
 SOURCE_COMMIT=<full-commit> \
-WEB_ORIGIN=https://dogeos-aa-testnet.vercel.app \
+WEB_ORIGIN=https://dogeos-demos.vercel.app \
 CLOUDFRONT_PREFIX_LIST=<regional-cloudfront-prefix-list> \
 node deploy/aws/render.mjs > /tmp/aa-testnet.json
 kubectl --context mydoge-wallet-staging apply -f /tmp/aa-testnet.json
@@ -47,7 +47,12 @@ login. This is a testnet counter demo, not a general public bundler.
 
 ## Deployment status
 
-Frontend: https://dogeos-aa-testnet.vercel.app/aa
+Frontend: https://dogeos-demos.vercel.app
+
+The Vercel project is named `dogeos-demos`. Its home page lists all four
+routes: `/external`, `/onchain`, `/randomness`, and `/aa`. Only the AA backend
+is deployed by the AWS manifests in this directory. The original deployment
+validation below records the previous frontend name and its transaction proof.
 
 The AWS service and Vercel deployment are live. Ten backend tests and the web
 build pass. A real Chikyu operation, sent through the published Vercel API to
@@ -57,7 +62,7 @@ confirmed receipt survived replacement of the AWS pod. See
 exact verification scope.
 
 Google/X login on the new origin is pending SDK client registration:
-`https://dogeos-aa-testnet.vercel.app` must be added to the same project that
+`https://dogeos-demos.vercel.app` must be added to the same project that
 already permits `https://partner-demos-lab.up.railway.app`. Browser checks
 confirmed that the existing origin starts the authentication flow while the
 new origin is rejected by the relay's CORS policy. The previous Railway
