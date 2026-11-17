@@ -16,7 +16,7 @@ The existing staging EKS cluster runs a single replica in its own
 `dogeos-aa-testnet` namespace with a 1 GiB persistent gp3 volume. Updates use
 `Recreate` to avoid simultaneous writers/executors. The AWS installation has
 its own funded testnet executor, so it can be verified independently of the
-existing Railway installation.
+former Railway installation.
 
 No private image repository is required for this demo: an official Node 24
 image is pinned by digest, and an init container downloads a full pinned
@@ -69,5 +69,16 @@ require a user to complete sign-in; the earlier counter proof used the SDK's
 external-wallet provider. External Rule still requires its partner API key
 and quest ID.
 
-The previous Railway installation remains deployed, but its origin currently
-receives HTTP 403 from the SDK preflight. Use the Vercel origin for social login.
+## Retired Railway copy
+
+On 2026-11-17, the duplicate `partner-demos` frontend and `partner-sponsorship`
+AA backend were deleted from Railway, along with their `partner-operations`
+volume. Configuration and state were privately archived before removal; the
+current AA state had no submitted or included operations. The old public and
+private endpoints are retired. Use `https://dogeos-demos.vercel.app` as the
+canonical frontend and the AWS backend described above.
+
+Randomness still uses the separate Railway keeper in `anyrand-chikyu-demo`.
+The separate devnet 7702 experiment and older `chikyu-aa-lab` are outside these
+four demos and were not removed. Historical validation files retain the URLs
+and deployment IDs that were used for those checks.

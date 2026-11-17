@@ -23,7 +23,7 @@ Solidity and OpenZeppelin versions.
 
 ## Deployment
 
-The v0.9 rollout is live at <https://partner-demos-lab.up.railway.app/aa>.
+The v0.9 rollout is live at <https://dogeos-demos.vercel.app/aa>.
 The checked-in Chikyū and browser manifests record confirmed deployments from
 2026-11-16 UTC; their contents and every runtime hash were verified against the
 network. The backend rejects manifests from another version or network.
@@ -62,7 +62,10 @@ state also has a separate v0.9 filename, `aa-operations-09.private.json`, on the
 existing `/data` volume. Before deployment, the old state held two confirmed
 operations and no submitted or included operations.
 
-| Component | Verified Railway deployment |
+The following IDs record the original rollout. Both Railway services were
+deleted on 2026-11-17; current hosting is documented in [aa-aws-vercel.md](aa-aws-vercel.md).
+
+| Component | Historical Railway deployment (retired) |
 | --- | --- |
 | Backend | `b1653106-3ad7-45ee-9147-2d34dcef1cb6` |
 | Web | `49313124-01c5-470b-8282-7ab025dba9c4` |
