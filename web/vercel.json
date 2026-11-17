@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "redirects": [{ "source": "/", "destination": "/aa", "permanent": false }],
+  "functions": { "app/api/aa/[...path]/route.ts": { "maxDuration": 60 } }
+}

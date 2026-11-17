@@ -19,7 +19,9 @@ async function handle(request: NextRequest, context: { params: Promise<{ path: s
       if (new TextEncoder().encode(body).length > 2048) return NextResponse.json({ error: 'Request too large.' }, { status: 413 });
     }
     const upstream = await fetch(`${process.env.AA_API_URL.replace(/\/$/, '')}/${route}`, {
-      method: request.method, headers: { 'content-type': 'application/json' }, body, cache: 'no-store', signal: AbortSignal.timeout(55000),
+      method: request.method, headers: { 'content-type': 'application/json',
+        ...(process.env.AA_API_TOKEN ? { 'x-aa-api-token': process.env.AA_API_TOKEN } : {}),
+      }, body, cache: 'no-store', signal: AbortSignal.timeout(55000),
     });
     return NextResponse.json(await upstream.json(), { status: upstream.status, headers: { 'cache-control': 'no-store' } });
   } catch { return NextResponse.json({ error: 'Unable to reach the bundler. Check this operation again before retrying.' }, { status: 503 }); }
