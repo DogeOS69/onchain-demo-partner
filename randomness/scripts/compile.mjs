@@ -12,8 +12,10 @@ export function compile() {
     'vendor/anyrand/contracts/networks/GasStationScroll.sol',
     'vendor/anyrand/contracts/networks/GasStationEthereum.sol',
     '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol',
+    '@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol',
     'test/MockCoordinator.sol',
     'test/PartnerConsumer.sol',
+    'test/UpgradeFixtures.sol',
   ];
   const sources = {};
   const resolve = name => fs.readFileSync(path.join(root, name.startsWith('@') || name.startsWith('solady/') ? 'node_modules' : '', name), 'utf8');
@@ -21,7 +23,7 @@ export function compile() {
   const input = {
     language: 'Solidity', sources,
     settings: { optimizer: { enabled: true, runs: 200 }, evmVersion: 'cancun',
-      outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object', 'evm.deployedBytecode.object'] } } },
+      outputSelection: { '*': { '*': ['abi', 'storageLayout', 'evm.bytecode.object', 'evm.deployedBytecode.object'] } } },
   };
   const output = JSON.parse(solc.compile(JSON.stringify(input), { import: name => {
     try { const content = resolve(name); sources[name] = { content }; return { contents: content }; }
@@ -35,7 +37,7 @@ export function compile() {
     for (const [contractName, c] of Object.entries(contracts)) {
       if (!c.evm.bytecode.object) continue;
       const artifact = { contractName, sourceName, compiler: solc.version(), abi: c.abi,
-        bytecode: `0x${c.evm.bytecode.object}`, deployedBytecode: `0x${c.evm.deployedBytecode.object}` };
+        bytecode: `0x${c.evm.bytecode.object}`, deployedBytecode: `0x${c.evm.deployedBytecode.object}`, storageLayout: c.storageLayout };
       artifacts[contractName] = artifact;
       fs.writeFileSync(path.join(root, 'artifacts', `${contractName}.json`), JSON.stringify(artifact, null, 2) + '\n');
     }

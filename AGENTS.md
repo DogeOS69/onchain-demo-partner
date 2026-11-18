@@ -12,7 +12,9 @@ one DogeOS SDK client. The deployed frontend source is on
   `dogeos-randomness-testnet`, deployment `keeper`. Its HTTPS status is served
   by Vercel at `/api/randomness/status`; the signing key stays in EKS.
   It uses Scroll-style prepaid delivery (estimated cost plus 50%) and a general
-  coordinator-event keeper with fee collection. See `docs/randomness-aws.md`
+  coordinator-event keeper with fee collection. All four Randomness contract
+  components are upgradeable; addresses and upgrade owners are recorded in
+  `randomness/deployments/chikyu.json`. See `docs/randomness-aws.md`
   and `docs/randomness-scroll-validation.json` for current operation.
 - Questing and SDK authentication use their existing shared services.
 - External Rule still needs its partner API configuration and quest ID.

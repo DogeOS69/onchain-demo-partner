@@ -3,18 +3,21 @@ pragma solidity 0.8.28;
 
 import {IAnyrand} from "../vendor/anyrand/contracts/interfaces/IAnyrand.sol";
 import {IDrandBeacon} from "../vendor/anyrand/contracts/interfaces/IDrandBeacon.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
 interface ICoordinator is IAnyrand {
     function currentBeaconPubKeyHash() external view returns (bytes32);
 }
 
 /// @notice Testnet dice demonstration. No stakes, prizes, or player-selected rounds.
-contract RandomnessDemo is ReentrancyGuard {
-    ICoordinator public immutable anyrand;
-    bytes32 public immutable pubKeyHash;
-    uint256 public immutable genesis;
-    uint256 public immutable period;
+/// @dev Deploy behind a TransparentUpgradeableProxy, initialized atomically.
+/// Upgrade authority belongs to the proxy's ProxyAdmin owner.
+contract RandomnessDemo is ReentrancyGuardUpgradeable {
+    // Preserve this storage order in future implementations; append new fields.
+    ICoordinator public anyrand;
+    bytes32 public pubKeyHash;
+    uint256 public genesis;
+    uint256 public period;
     uint256 public constant DELAY_SECONDS = 90;
     uint256 public constant CALLBACK_GAS_LIMIT = 150_000;
 
@@ -42,7 +45,12 @@ contract RandomnessDemo is ReentrancyGuard {
     event RollFulfilled(uint256 indexed requestId, address indexed player, uint256 word, uint8 face);
     event RequestPayment(uint256 indexed requestId, address indexed player, uint256 feePaid, uint256 refunded);
 
-    constructor(address coordinator, address beacon) {
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address coordinator, address beacon) external initializer {
+        __ReentrancyGuard_init();
         anyrand = ICoordinator(coordinator);
         pubKeyHash = IDrandBeacon(beacon).publicKeyHash();
         genesis = IDrandBeacon(beacon).genesisTimestamp();

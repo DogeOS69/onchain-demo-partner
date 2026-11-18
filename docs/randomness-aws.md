@@ -71,6 +71,15 @@ attention. Costs include DogeOS data fees. The worker reconstructs its event
 index on restart, with a 32-block overlap and paginated RPC scans; this remains
 a single-instance testnet service, not a production SLA.
 
+All four contract components are upgradeable. The coordinator remains at its
+original UUPS proxy. The consumer, drand verifier and gas estimator use transparent
+proxies with individual ProxyAdmins; addresses and owners are recorded in
+`randomness/deployments/chikyu.json`. The existing testnet keeper/owner controls
+these admins. The one-time migration changed the three direct component addresses;
+subsequent compatible upgrades keep the proxy addresses and stored state. Historical
+consumer data remains at the retired addresses. See `randomness/README.md` for the
+upgrade entrypoints and compatibility requirements.
+
 The public frontend stays at `/randomness`; the consumer address changed.
 Historical migration receipts below describe the earlier free demo. See
 [randomness-scroll-validation.json](randomness-scroll-validation.json) for paid
