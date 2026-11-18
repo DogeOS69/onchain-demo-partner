@@ -3,13 +3,14 @@ pragma solidity 0.8.28;
 
 import {IAnyrand} from "../vendor/anyrand/contracts/interfaces/IAnyrand.sol";
 import {IDrandBeacon} from "../vendor/anyrand/contracts/interfaces/IDrandBeacon.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 interface ICoordinator is IAnyrand {
     function currentBeaconPubKeyHash() external view returns (bytes32);
 }
 
 /// @notice Testnet dice demonstration. No stakes, prizes, or player-selected rounds.
-contract RandomnessDemo {
+contract RandomnessDemo is ReentrancyGuard {
     ICoordinator public immutable anyrand;
     bytes32 public immutable pubKeyHash;
     uint256 public immutable genesis;
@@ -28,14 +29,18 @@ contract RandomnessDemo {
         uint256 word;
     }
     mapping(uint256 => Roll) private rolls;
+    mapping(uint256 => uint256) public feesPaid;
     uint256[] public requestIds;
 
     error OnlyCoordinator();
     error UnknownOrFulfilledRequest();
     error IncorrectFee(uint256 expected);
     error BeaconChanged();
+    error AutomaticDeliveryOnly();
+    error RefundFailed();
     event RollRequested(uint256 indexed requestId, address indexed player, bool automatic, uint256 round);
     event RollFulfilled(uint256 indexed requestId, address indexed player, uint256 word, uint8 face);
+    event RequestPayment(uint256 indexed requestId, address indexed player, uint256 feePaid, uint256 refunded);
 
     constructor(address coordinator, address beacon) {
         anyrand = ICoordinator(coordinator);
@@ -49,17 +54,28 @@ contract RandomnessDemo {
         (fee,) = anyrand.getRequestPrice(CALLBACK_GAS_LIMIT);
     }
 
-    function requestRoll(bool automatic) external payable returns (uint256 id) {
+    /// @notice msg.value is the caller's maximum service payment. Reprice in
+    /// this transaction, forward exactly the coordinator fee, and refund the
+    /// excess now. This is not a refund of unused future callback gas.
+    function requestRoll(bool automatic) external payable nonReentrant returns (uint256 id) {
+        if (!automatic) revert AutomaticDeliveryOnly();
         if (anyrand.currentBeaconPubKeyHash() != pubKeyHash) revert BeaconChanged();
         uint256 fee = quote();
-        if (msg.value != fee) revert IncorrectFee(fee);
+        if (msg.value < fee) revert IncorrectFee(fee);
         uint256 deadline = block.timestamp + DELAY_SECONDS;
         uint256 delta = deadline - genesis;
         uint64 round = uint64(delta / period + (delta % period > 0 ? 1 : 0) + 1);
         id = anyrand.requestRandomness{value: fee}(deadline, CALLBACK_GAS_LIMIT);
         rolls[id] = Roll(msg.sender, uint64(block.timestamp), uint64(block.number), round, automatic, false, 0, 0);
+        feesPaid[id] = fee;
         requestIds.push(id);
         emit RollRequested(id, msg.sender, automatic, round);
+        uint256 refund = msg.value - fee;
+        if (refund != 0) {
+            (bool sent,) = msg.sender.call{value: refund}("");
+            if (!sent) revert RefundFailed();
+        }
+        emit RequestPayment(id, msg.sender, fee, refund);
     }
 
     function receiveRandomness(uint256 id, uint256 word) external {

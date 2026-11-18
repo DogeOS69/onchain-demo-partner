@@ -3,10 +3,12 @@ import { clients, assertChikyu, readDeployment, contract, stringify } from '../l
 import { sendContract } from '../lib/transactions.mjs';
 const c = clients({ signing: true }); await assertChikyu(c.publicClient);
 const demo = contract(readDeployment(), 'RandomnessDemo');
-const automatic = !process.argv.includes('--manual');
+if (process.argv.includes('--manual')) throw new Error('The paid demo uses automatic delivery');
+const automatic = true;
 const gasPrice = await c.publicClient.getGasPrice();
 const quote = await c.publicClient.call({ to: demo.address, data: encodeFunctionData({ abi: demo.abi, functionName: 'quote' }), gasPrice });
-const value = decodeFunctionResult({ abi: demo.abi, functionName: 'quote', data: quote.data });
-const result = await sendContract({ ...c, contract: demo, functionName: 'requestRoll', args: [automatic], value });
+const fee = decodeFunctionResult({ abi: demo.abi, functionName: 'quote', data: quote.data });
+const value = (fee * 125n + 99n) / 100n;
+const result = await sendContract({ ...c, contract: demo, functionName: 'requestRoll', args: [automatic], value, gasPrice });
 const event = result.receipt.logs.filter(l => l.address.toLowerCase() === demo.address.toLowerCase()).map(l => decodeEventLog({ abi: demo.abi, ...l })).find(e => e.eventName === 'RollRequested');
 console.log(stringify({ ...event.args, hash: result.hash, block: result.receipt.blockNumber }));

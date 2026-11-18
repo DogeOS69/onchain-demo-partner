@@ -13,6 +13,7 @@ export function compile() {
     'vendor/anyrand/contracts/networks/GasStationEthereum.sol',
     '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol',
     'test/MockCoordinator.sol',
+    'test/PartnerConsumer.sol',
   ];
   const sources = {};
   const resolve = name => fs.readFileSync(path.join(root, name.startsWith('@') || name.startsWith('solady/') ? 'node_modules' : '', name), 'utf8');

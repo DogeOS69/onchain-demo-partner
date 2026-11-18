@@ -18,7 +18,12 @@
     "delaySeconds": 90,
     "minConfirmations": 18,
     "callbackGasLimit": 150000,
-    "requestPremiumMultiplierBps": 0
+    "requestPremiumMultiplierBps": 15000,
+    "delivery": "automatic",
+    "paymentHeadroomBps": 2500,
+    "maxPaymentDoge": "0.5",
+    "withdrawMinDoge": "0.1",
+    "maxAutoFulfillments": 0
   },
   "contracts": {
     "DrandBeacon": {
@@ -50,19 +55,28 @@
       "gasUsed": "349023"
     },
     "RandomnessDemo": {
-      "address": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
-      "transactionHash": "0x8e241496480cfb36947a92169a9d62517ac622662d2fd6163d0732bcb6696422",
-      "blockNumber": "9400131",
-      "estimatedCostDoge": "0.367589275676409705",
-      "gasUsed": "821750"
+      "address": "0xe31d349bf4a412d27b68a74767ecd635b8be0686",
+      "transactionHash": "0xd5d6a395634d249e3876f1575551d46a0364bbaacf1ae24baab35ef96e3d48c8",
+      "blockNumber": "9574014",
+      "gasUsed": "914896",
+      "estimatedCostDoge": "0.526847195248682368"
     }
   },
   "complete": true,
   "balanceAfterDeploymentDoge": "40.989105086639155161",
   "keeperUrl": "/api/randomness",
-  "railway": {
-    "projectId": "30b765d5-9f54-49c8-9357-b3775f0ac655",
-    "environmentId": "e9453bfa-e87d-4f2f-a1f4-556dcdb98274",
-    "serviceId": "6812147c-c1db-49fa-a63d-711078c29f8c"
+  "retiredConsumers": [
+    {
+      "address": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+      "transactionHash": "0x8e241496480cfb36947a92169a9d62517ac622662d2fd6163d0732bcb6696422",
+      "blockNumber": "9400131",
+      "estimatedCostDoge": "0.367589275676409705",
+      "gasUsed": "821750",
+      "reason": "Replaced by the paid consumer with bounded payment and immediate excess refund"
+    }
+  ],
+  "paidActivation": {
+    "transactionHash": "0xf56bf884f05b18925e72a703fb858053d5b650daa36796901981438d63413e27",
+    "blockNumber": "9574016"
   }
 }

@@ -23,7 +23,7 @@ distribution is needed for this keeper.
   `MIN_CONFIRMATIONS`, `MIN_BALANCE_DOGE`, `MAX_TX_COST_DOGE`,
   `MAX_AUTO_FULFILLMENTS` and `KEEPER_POLL_MS`. Never commit these values.
 - The worker reconstructs pending requests and its cumulative fulfillment
-  budget from the contracts on restart. It needs no persistent volume or
+  accounting from confirmed coordinator events on restart. It needs no persistent volume or
   database. Do not run another keeper using this signing key.
 - The official Node 24 image is pinned by digest. An init container fetches
   a full pinned public source commit and installs the locked production
@@ -49,8 +49,32 @@ frontend configuration uses `/api/randomness`, so its browser requests stay
 on the demo's origin. Verify a recent `/status` poll and an automatic request
 whose fulfillment receipt succeeds on Chikyu before deleting an old service.
 
-The contracts, consumer callback, 18-confirmation wait, 100-fulfillment cap,
-2 DOGE minimum balance and 0.2 DOGE transaction-cost cap are unchanged.
+## Paid delivery model
+
+The current keeper fulfills paid requests from the Anyrand coordinator, including
+other consumer contracts. The coordinator uses a 15000-basis-point multiplier:
+estimated fulfillment cost plus 50%. The new dice consumer forwards the fee and
+refunds excess payment during the request. The original AnyRand coordinator,
+beacon and GasStationScroll code remain unchanged.
+
+The 18-confirmation wait, 2 DOGE minimum wallet balance and 0.2 DOGE transaction
+cost cap remain. `MAX_AUTO_FULFILLMENTS=0` disables the former cumulative cap.
+The renderer explicitly sets `AUTO_WITHDRAW=true` and `WITHDRAW_MIN_DOGE=0.1`.
+It collects only fees available after reserving pending requests, using upstream
+`withdrawETH`. Current testnet owner and keeper are the same wallet; if a
+multisig becomes owner, it must handle withdrawals and keeper replenishment.
+
+Status includes `feesCollectedWei`, `feesWithdrawnWei`, `pendingFeeReserveWei`,
+`availableFeesWei`, `fulfillmentCostWei`, `withdrawalCostWei`, `lastWithdrawal`
+and `withdrawalRequired`. `waiting-gas`, `low-balance` and `retrying` need operator
+attention. Costs include DogeOS data fees. The worker reconstructs its event
+index on restart, with a 32-block overlap and paginated RPC scans; this remains
+a single-instance testnet service, not a production SLA.
+
+The public frontend stays at `/randomness`; the consumer address changed.
+Historical migration receipts below describe the earlier free demo. See
+[randomness-scroll-validation.json](randomness-scroll-validation.json) for paid
+requests, fee collection and restart evidence.
 
 ## Shared staging cluster
 

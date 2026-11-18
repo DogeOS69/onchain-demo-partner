@@ -10,7 +10,7 @@ export const chain = defineChain({
   rpcUrls: { default: { http: ['https://rpc.testnet.dogeos.com'] } },
   blockExplorers: { default: { name: 'L2Scan', url: 'https://dogeos-testnet.l2scan.co' } }, testnet: true,
 });
-export const oracle = { address: '0x5300000000000000000000000000000000000002', abi: parseAbi(['function getL1Fee(bytes) view returns (uint256)']) };
+export const oracle = { address: '0x5300000000000000000000000000000000000002', abi: parseAbi(['function getL1Fee(bytes) view returns (uint256)', 'function isGalileo() view returns (bool)']) };
 export const artifact = name => JSON.parse(fs.readFileSync(path.join(root, 'artifacts', `${name}.json`), 'utf8'));
 export const deploymentPath = () => path.resolve(root, process.env.DEPLOYMENT_FILE || 'deployments/chikyu.json');
 export const readDeployment = () => JSON.parse(fs.readFileSync(deploymentPath(), 'utf8'));

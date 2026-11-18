@@ -14,7 +14,7 @@ if (existing && (existing.chainId !== chain.id || existing.deployer.toLowerCase(
 const deployment = existing ?? {
   chainId: chain.id, network: chain.name, rpcUrl: chain.rpcUrls.default.http[0], explorer: chain.blockExplorers.default.url,
   deployer: account.address, createdAt: new Date().toISOString(), beacon: info,
-  policy: { delaySeconds: 90, minConfirmations: 18, callbackGasLimit: 150000, requestPremiumMultiplierBps: 0 }, contracts: {},
+  policy: { delaySeconds: 90, minConfirmations: 18, callbackGasLimit: 150000, requestPremiumMultiplierBps: 15000 }, contracts: {},
 };
 writeJson(file, deployment);
 async function deploy(name, artifactName, args) {
@@ -53,7 +53,7 @@ async function deploy(name, artifactName, args) {
 const beacon = await deploy('DrandBeacon', 'DrandBeacon', [publicKeyToEvm(info.public_key), BigInt(info.genesis_time), BigInt(info.period)]);
 const gasStation = await deploy('GasStationScroll', 'GasStationScroll', []);
 const implementation = await deploy('Anyrand', 'Anyrand', []);
-const init = encodeFunctionData({ abi: artifact('Anyrand').abi, functionName: 'init', args: [beacon, 0n, 200000n, 300n, gasStation, 1000000000000n] });
+const init = encodeFunctionData({ abi: artifact('Anyrand').abi, functionName: 'init', args: [beacon, 15000n, 200000n, 300n, gasStation, 1000000000000n] });
 const coordinator = await deploy('Coordinator', 'ERC1967Proxy', [implementation, init]);
 await deploy('RandomnessDemo', 'RandomnessDemo', [coordinator, beacon]);
 deployment.complete = true;

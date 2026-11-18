@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-18T04:51:11.441368+00:00",
+  "status": "contracts activated; runtime rollout and end-to-end validation pending",
+  "coordinator": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
+  "consumer": {
+    "address": "0xe31d349bf4a412d27b68a74767ecd635b8be0686",
+    "transactionHash": "0xd5d6a395634d249e3876f1575551d46a0364bbaacf1ae24baab35ef96e3d48c8",
+    "blockNumber": "9574014",
+    "gasUsed": "914896",
+    "estimatedCostDoge": "0.526847195248682368"
+  },
+  "activation": {
+    "transactionHash": "0xf56bf884f05b18925e72a703fb858053d5b650daa36796901981438d63413e27",
+    "blockNumber": "9574016"
+  },
+  "requestPremiumMultiplierBps": 15000,
+  "coreContractsChanged": false,
+  "tests": {
+    "randomnessIntegration": 8,
+    "typecheck": "passed",
+    "productionBuild": "passed"
+  },
+  "pending": [
+    "EKS rollout",
+    "Vercel deployment",
+    "paid fulfillments and fee collection",
+    "restart and browser validation"
+  ]
+}

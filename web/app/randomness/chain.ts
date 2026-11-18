@@ -10,6 +10,7 @@ export const client = createPublicClient({ chain, transport: http(config.rpcUrl,
 export const demo = { address: config.consumer as Address, abi: parseAbi([
   'function requestRoll(bool automatic) payable returns (uint256)',
   'function quote() view returns (uint256)',
+  'function feesPaid(uint256 id) view returns (uint256)',
   'function rollCount() view returns (uint256)',
   'function recentIds(uint256 limit) view returns (uint256[])',
   'function pubKeyHash() view returns (bytes32)',
@@ -18,6 +19,7 @@ export const demo = { address: config.consumer as Address, abi: parseAbi([
   'function getRoll(uint256 id) view returns (Roll)',
   'event RollRequested(uint256 indexed requestId, address indexed player, bool automatic, uint256 round)',
   'event RollFulfilled(uint256 indexed requestId, address indexed player, uint256 word, uint8 face)',
+  'event RequestPayment(uint256 indexed requestId, address indexed player, uint256 feePaid, uint256 refunded)',
 ]) };
 export const coordinator = { address: config.coordinator as Address, abi: parseAbi([
   'function getRequestState(uint256 id) view returns (uint8)',
@@ -25,13 +27,14 @@ export const coordinator = { address: config.coordinator as Address, abi: parseA
   'event RandomnessFulfilled(uint256 indexed requestId, uint256 randomness, bool callbackSuccess, uint256 actualGasUsed)',
 ]) };
 export const beacon = { address: config.beacon as Address, abi: parseAbi(['function verifyBeaconRound(uint256 round, uint256[2] signature) view']) };
-export type Roll = { id: bigint; player: Address; requestedAt: bigint; requestBlock: bigint; round: bigint; automatic: boolean; fulfilled: boolean; face: number; word: bigint; state: number };
+export type Roll = { id: bigint; player: Address; requestedAt: bigint; requestBlock: bigint; round: bigint; automatic: boolean; fulfilled: boolean; face: number; word: bigint; state: number; feePaid: bigint };
 export async function readRoll(id: bigint): Promise<Roll> {
-  const [roll, state] = await Promise.all([
+  const [roll, state, feePaid] = await Promise.all([
     client.readContract({ ...demo, functionName: 'getRoll', args: [id] }),
     client.readContract({ ...coordinator, functionName: 'getRequestState', args: [id] }),
+    client.readContract({ ...demo, functionName: 'feesPaid', args: [id] }),
   ]);
-  return { id, ...roll, state };
+  return { id, ...roll, state, feePaid };
 }
 export async function fetchProof(round: bigint) {
   let lastError: unknown;

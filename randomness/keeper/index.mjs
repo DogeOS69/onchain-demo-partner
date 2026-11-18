@@ -6,10 +6,11 @@ const c = clients({ signing: true });
 await assertChikyu(c.publicClient);
 const deployment = readDeployment();
 if (!deployment.complete) throw new Error('Incomplete deployment manifest');
-const worker = createKeeper({ ...c, demo: contract(deployment, 'RandomnessDemo'), coordinator: contract(deployment, 'Coordinator'),
-  beacon: contract(deployment, 'DrandBeacon'), minConfirmations: Number(process.env.MIN_CONFIRMATIONS || 18),
+const worker = createKeeper({ ...c, coordinator: contract(deployment, 'Coordinator'),
+  deploymentBlock: BigInt(deployment.contracts.Coordinator.blockNumber), minConfirmations: Number(process.env.MIN_CONFIRMATIONS || 18),
   minBalanceDoge: process.env.MIN_BALANCE_DOGE || '2', maxCostDoge: process.env.MAX_TX_COST_DOGE || '0.2',
-  maxAutoFulfillments: Number(process.env.MAX_AUTO_FULFILLMENTS || 100) });
+  maxAutoFulfillments: Number(process.env.MAX_AUTO_FULFILLMENTS ?? 0),
+  autoWithdraw: process.env.AUTO_WITHDRAW !== 'false', withdrawMinDoge: process.env.WITHDRAW_MIN_DOGE || '0.1' });
 const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
