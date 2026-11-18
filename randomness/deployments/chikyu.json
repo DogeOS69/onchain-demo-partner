@@ -59,7 +59,7 @@
   },
   "complete": true,
   "balanceAfterDeploymentDoge": "40.989105086639155161",
-  "keeperUrl": "https://keeper-production-fd08a51c.up.railway.app",
+  "keeperUrl": "/api/randomness",
   "railway": {
     "projectId": "30b765d5-9f54-49c8-9357-b3775f0ac655",
     "environmentId": "e9453bfa-e87d-4f2f-a1f4-556dcdb98274",

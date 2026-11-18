@@ -10,6 +10,6 @@
   "period": 3,
   "beaconHash": "04f1e9062b8a81f848fded9c12306733282b2727ecced50032187751166ec8c3",
   "minConfirmations": 18,
-  "keeperUrl": "https://keeper-production-fd08a51c.up.railway.app",
+  "keeperUrl": "/api/randomness",
   "requestDelay": 90
 }
