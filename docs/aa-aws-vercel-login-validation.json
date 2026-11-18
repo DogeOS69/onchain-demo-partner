@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-11-17T23:29:20.278Z",
+  "origin": "https://dogeos-demos.vercel.app",
+  "providers": [
+    {
+      "provider": "Google",
+      "flowStatus": 200,
+      "providerPageReached": true,
+      "popupHost": "accounts.google.com",
+      "pageErrors": []
+    },
+    {
+      "provider": "X",
+      "flowStatus": 200,
+      "providerPageReached": true,
+      "popupHost": "x.com",
+      "pageErrors": []
+    }
+  ],
+  "qualification": "Verified provider flow creation and navigation to provider; human authentication and wallet signing not completed.",
+  "externalRuleConfigured": false,
+  "originPreflightStatus": 204,
+  "previousRailwayOriginPreflightStatus": 403
+}

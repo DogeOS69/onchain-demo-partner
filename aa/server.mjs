@@ -6,6 +6,7 @@ import { launchAlto } from './lib/alto.mjs';
 import { createEngine } from './lib/engine.mjs';
 import { chainId, json, readJson, root, rpcUrl, safeError } from './lib/chain.mjs';
 import { ApiError } from './lib/user-operation.mjs';
+import { authorizedServiceRequest } from './lib/service-auth.mjs';
 
 const manifest = await readJson(resolve(root, 'config/chikyu.json'));
 assert.equal(manifest.entryPointVersion, '0.9', 'Run the v0.9 deployment script before starting this backend');
@@ -15,7 +16,9 @@ const keys = process.env.BUNDLER_EXECUTOR_PRIVATE_KEY ? {
   executorPrivateKey: process.env.BUNDLER_EXECUTOR_PRIVATE_KEY,
 } : await readJson(process.env.AA_KEY_FILE ?? resolve(root, '.runtime/keys.json'));
 const executor = privateKeyToAccount(keys.executorPrivateKey).address;
-assert(executor.toLowerCase() === manifest.executor.toLowerCase(), 'Wrong bundler executor');
+assert(executor.toLowerCase() === (process.env.BUNDLER_EXECUTOR_ADDRESS ?? manifest.executor).toLowerCase(), 'Wrong bundler executor');
+const apiToken = process.env.AA_API_TOKEN;
+assert(!apiToken || apiToken.length >= 32, 'AA_API_TOKEN must contain at least 32 characters');
 const webOrigin = process.env.WEB_ORIGIN ? new URL(process.env.WEB_ORIGIN).origin : undefined;
 let engine, alto, timer, ready = false;
 const rates = new Map();
@@ -54,6 +57,7 @@ const server = createServer(async (request, response) => {
       return response.end();
     }
     if (request.method === 'GET' && path === '/health') return respond(request, response, ready ? 200 : 503, { ready, chainId });
+    if (!authorizedServiceRequest(request.headers['x-aa-api-token'], apiToken)) throw new ApiError(401, 'Unauthorized.');
     if (!ready) throw new ApiError(503, 'Account abstraction is starting. Try again shortly.');
     if (request.method === 'GET' && path === '/config') return respond(request, response, 200, await engine.config());
     if (request.method === 'POST') {
@@ -77,7 +81,7 @@ const server = createServer(async (request, response) => {
   }
 });
 server.requestTimeout = 60_000; server.headersTimeout = 15_000;
-server.listen(Number(process.env.PORT ?? 4341), process.env.RAILWAY_SERVICE_ID ? '::' : '127.0.0.1');
+server.listen(Number(process.env.PORT ?? 4341), process.env.AA_BIND_HOST ?? (process.env.RAILWAY_SERVICE_ID ? '::' : '127.0.0.1'));
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
   ready = false; clearInterval(timer); alto?.child.kill('SIGTERM'); server.close();
   setTimeout(() => process.exit(0), 1000).unref();

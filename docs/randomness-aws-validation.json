@@ -1,0 +1,170 @@
+{
+  "checkedAt": "2026-11-18T00:04:51.931Z",
+  "cluster": "mydoge-wallet-staging-eks",
+  "namespace": "dogeos-randomness-testnet",
+  "sourceCommit": "760e035b8df4346f55cfc246859f4950a36ae9c4",
+  "request": {
+    "requestId": "8",
+    "player": "0x32d2E08014e96e239b516505462Ec2317CB2738d",
+    "automatic": true,
+    "round": "22479721",
+    "hash": "0x815e7fcf52cf78794d7807a7fe1ed92b5a1eacd79e8d3ab165a4217cfc44a001",
+    "block": "9568251"
+  },
+  "fulfillment": {
+    "hash": "0x5be4124c445f122fea01fe316357f3a6f6a22fc7308c262c8c6cd8448372febe",
+    "block": "9568284",
+    "status": "success",
+    "from": "0x4518a4baa6be1a6977f589168cff6ce68101703c",
+    "gasUsed": "244093"
+  },
+  "roll": {
+    "player": "0x32d2E08014e96e239b516505462Ec2317CB2738d",
+    "requestedAt": "1794960144",
+    "requestBlock": "9568251",
+    "round": "22479721",
+    "automatic": true,
+    "fulfilled": true,
+    "face": 4,
+    "word": "108835914064187752691065543942752036648717026218621673148744579458682777901179"
+  },
+  "keeperStatus": {
+    "startedAt": "2026-11-18T00:00:54.430Z",
+    "lastPollAt": "2026-11-18T00:04:47.420Z",
+    "lastSuccessAt": "2026-11-18T00:04:05.485Z",
+    "lastTransaction": "0x5be4124c445f122fea01fe316357f3a6f6a22fc7308c262c8c6cd8448372febe",
+    "lastError": null,
+    "pending": 0,
+    "completedAutomatic": 5,
+    "scanned": 8,
+    "state": "watching",
+    "wallet": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+    "minConfirmations": 18,
+    "maxAutoFulfillments": 100,
+    "minBalanceDoge": "2",
+    "maxCostDoge": "0.2",
+    "balanceWei": "35357357278361359305",
+    "head": "9568298",
+    "chainId": 6281971,
+    "consumer": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b"
+  },
+  "currentSourceCommit": "aefff0da06c9da9235e5b41011a10245b9458b28",
+  "replicas": 1,
+  "persistentVolume": false,
+  "publicStatus": "https://dogeos-demos.vercel.app/api/randomness/status",
+  "restartValidation": {
+    "checkedAt": "2026-11-18T00:07:24.518Z",
+    "sourceCommit": "aefff0da06c9da9235e5b41011a10245b9458b28",
+    "previousStartedAt": "2026-11-18T00:00:54.430Z",
+    "status": {
+      "startedAt": "2026-11-18T00:06:02.329Z",
+      "lastPollAt": "2026-11-18T00:07:23.013Z",
+      "lastSuccessAt": null,
+      "lastTransaction": null,
+      "lastError": null,
+      "pending": 0,
+      "completedAutomatic": 5,
+      "scanned": 8,
+      "state": "watching",
+      "wallet": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "minConfirmations": 18,
+      "maxAutoFulfillments": 100,
+      "minBalanceDoge": "2",
+      "maxCostDoge": "0.2",
+      "balanceWei": "35357357278361359305",
+      "head": "9568350",
+      "chainId": 6281971,
+      "consumer": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b"
+    },
+    "nonce": 12,
+    "duplicateFulfillment": false
+  },
+  "browserValidation": {
+    "checkedAt": "2026-11-18T00:07:08.145Z",
+    "frontend": "https://dogeos-demos.vercel.app",
+    "deploymentId": "dpl_9uwJL3hPskwFheLiKMTQSuV4gcsg",
+    "routes": [
+      {
+        "route": "/",
+        "status": 200
+      },
+      {
+        "route": "/external",
+        "status": 200
+      },
+      {
+        "route": "/onchain",
+        "status": 200
+      },
+      {
+        "route": "/aa",
+        "status": 200
+      },
+      {
+        "route": "/randomness",
+        "status": 200
+      }
+    ],
+    "errors": [],
+    "statusEndpoint": "https://dogeos-demos.vercel.app/api/randomness/status",
+    "keeper": {
+      "startedAt": "2026-11-18T00:06:02.329Z",
+      "lastPollAt": "2026-11-18T00:07:05.621Z",
+      "lastSuccessAt": null,
+      "lastTransaction": null,
+      "lastError": null,
+      "pending": 0,
+      "completedAutomatic": 5,
+      "scanned": 8,
+      "state": "watching",
+      "wallet": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "minConfirmations": 18,
+      "maxAutoFulfillments": 100,
+      "minBalanceDoge": "2",
+      "maxCostDoge": "0.2",
+      "balanceWei": "35357357278361359305",
+      "head": "9568344",
+      "chainId": 6281971,
+      "consumer": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b"
+    },
+    "displayedRequest": "8",
+    "displayedResult": "4",
+    "railwayRequests": [],
+    "mobileWidth": 360
+  },
+  "railwayRetirement": {
+    "projectId": "30b765d5-9f54-49c8-9357-b3775f0ac655",
+    "serviceId": "6812147c-c1db-49fa-a63d-711078c29f8c",
+    "serviceDeleted": true,
+    "remainingServices": 0,
+    "detachedVolumes": [],
+    "checks": {
+      "checkedAt": "2026-11-18T00:08:09.891010+00:00",
+      "endpoints": [
+        {
+          "url": "https://keeper-production-fd08a51c.up.railway.app/status",
+          "status": 404
+        },
+        {
+          "url": "https://dogeos-demos.vercel.app/api/randomness/status",
+          "status": 200,
+          "keeper": {
+            "state": "watching",
+            "lastPollAt": "2026-11-18T00:08:06.413Z",
+            "lastError": null,
+            "pending": 0
+          }
+        },
+        {
+          "url": "https://dogeos-demos.vercel.app/randomness",
+          "status": 200
+        }
+      ]
+    }
+  },
+  "tests": {
+    "randomnessIntegration": 5,
+    "typecheck": "passed",
+    "vercelProductionBuild": "passed"
+  }
+}

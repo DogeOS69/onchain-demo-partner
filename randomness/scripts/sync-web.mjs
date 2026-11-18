@@ -7,6 +7,7 @@ const config = { chainId: d.chainId, rpcUrl: d.rpcUrl, explorer: d.explorer,
   consumer: d.contracts.RandomnessDemo.address, coordinator: d.contracts.Coordinator.address, beacon: d.contracts.DrandBeacon.address,
   deploymentBlock: d.contracts.RandomnessDemo.blockNumber, genesis: d.beacon.genesis_time, period: d.beacon.period,
   beaconHash: d.beacon.chain_hash, minConfirmations: d.policy.minConfirmations,
+  requestPremiumMultiplierBps: d.policy.requestPremiumMultiplierBps,
   keeperUrl: process.env.KEEPER_URL || d.keeperUrl || '', requestDelay: d.policy.delaySeconds,
 };
 fs.mkdirSync(path.join(root, '..', 'web', 'app', 'randomness'), { recursive: true });

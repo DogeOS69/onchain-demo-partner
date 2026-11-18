@@ -1,6 +1,6 @@
 # Account abstraction on Chikyū
 
-The [hosted example](https://partner-demos-lab.up.railway.app/aa) runs canonical **EntryPoint v0.9**, aligned with DogeOS preinstalls v0.2.2. Contracts, backend and web were deployed and verified on Chikyū on 2026-11-16 UTC; see [entrypoint-09.md](entrypoint-09.md) and the [validation receipts](aa-validation.json).
+The [hosted example](https://dogeos-demos.vercel.app/aa) runs canonical **EntryPoint v0.9**, aligned with DogeOS preinstalls v0.2.2. Contracts, backend and web were deployed and verified on Chikyū on 2026-11-16 UTC; see [entrypoint-09.md](entrypoint-09.md) and the [validation receipts](aa-validation.json).
 
 The connected DogeOS SDK wallet owns the smart account. Its address is derived from that owner and **salt `0`** using the pinned factory. The user adds test DOGE to that address and signs an operation that increments a counter. The smart account pays the gas, including account deployment on its first operation and the DogeOS data fee.
 
@@ -52,7 +52,7 @@ Set `BUNDLER_EXECUTOR_PRIVATE_KEY` on the backend, or `AA_KEY_FILE` to a private
 
 Start with `npm --prefix aa start`. Set `AA_API_URL=http://127.0.0.1:4341` on the web server, plus the existing SDK client configuration, then run `npm --prefix web run dev`. SDK public settings require a rebuild when changed. The restricted API accepts only this counter flow; Alto listens only on loopback.
 
-Railway runs the backend and web separately. The existing private service is still named `partner-sponsorship` for deployment continuity; the web uses `AA_API_URL=http://partner-sponsorship.railway.internal:4341`. It now runs the `aa/` Dockerfile. Keep its existing `/data` volume and one replica. Deploy `web/` with its own Dockerfile. Old paymaster contracts and their funds are not used or withdrawn by this change.
+The web runs on Vercel and forwards its restricted AA API to AWS. Configure the server-only `AA_API_URL` and `AA_API_TOKEN` as described in [the deployment guide](aa-aws-vercel.md). AWS runs one backend replica with persistent state. The former Railway services `partner-demos` and `partner-sponsorship`, including their volume, were deleted on 2026-11-17. Old paymaster contracts and their funds are not used or withdrawn by this change.
 
 ## Operator handoff
 
@@ -73,7 +73,7 @@ of the integration, not a production availability or security commitment.
 
 The backend tests run a real Anvil chain and Alto process: salt-0 derivation, failure without account funds, account-paid deployment/execution, exact balance/deposit accounting, replay protection, signature and intent checks, real bundling, restart recovery and pending recovery beyond the preview TTL. A pricing regression checks that data-fee reimbursement cannot inflate the bundle tip, including retries.
 
-For the real testnet browser flow, install root dependencies and Chromium, build the web app with a registered client ID and `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=false`, then set `WEB_URL` and `TEST_KEY_FILE` to a private JSON containing a dedicated test owner's `privateKey`, fund that owner's EOA with enough test DOGE for the displayed maximum and its funding transfer, then run `npm run test:browser:aa`. It uses the actual SDK picker with an injected test provider, approves a bounded funding transfer and signs one UserOperation. Signing stays in the Node test runner. It verifies account payment of the full network fee, zero paymaster, reload recovery and the shared SDK connection. For testing against the published backend, a local web build can proxy to `AA_API_URL=https://partner-demos-lab.up.railway.app/api/aa`. The public deployment uses Google/X login; this browser test does not complete OAuth or exercise a human wallet extension.
+For the real testnet browser flow, install root dependencies and Chromium, build the web app with a registered client ID and `NEXT_PUBLIC_SOCIAL_LOGIN_ENABLED=false`, then set `WEB_URL` and `TEST_KEY_FILE` to a private JSON containing a dedicated test owner's `privateKey`, fund that owner's EOA with enough test DOGE for the displayed maximum and its funding transfer, then run `npm run test:browser:aa`. It uses the actual SDK picker with an injected test provider, approves a bounded funding transfer and signs one UserOperation. Signing stays in the Node test runner. It verifies account payment of the full network fee, zero paymaster, reload recovery and the shared SDK connection. For testing against the published backend, a local web build can proxy to `AA_API_URL=https://dogeos-demos.vercel.app/api/aa`. The public deployment uses Google/X login; this browser test does not complete OAuth or exercise a human wallet extension.
 
 `docs/aa-validation.json` records the **v0.9** network and browser proof.
 The earlier self-paid v0.7 proof remains in `docs/aa-07-validation.json`;

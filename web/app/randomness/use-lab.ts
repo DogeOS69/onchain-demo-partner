@@ -2,12 +2,13 @@
 import { useAccount, useConnectors, useWalletConnect } from '@dogeos/dogeos-sdk';
 import { useWriteTx } from '../useWriteTx';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createWalletClient, custom, decodeEventLog, decodeFunctionResult, encodeFunctionData, encodeAbiParameters, formatEther, keccak256, toHex, type Address, type EIP1193Provider, type Hash } from 'viem';
+import { createWalletClient, custom, decodeEventLog, decodeFunctionResult, encodeFunctionData, encodeAbiParameters, formatEther, parseEther, keccak256, toHex, type Address, type EIP1193Provider, type Hash } from 'viem';
 import { chain, client, config, coordinator, demo, fetchProof, readRoll, type Roll } from './chain';
 
 type Provider = EIP1193Provider & { on?: (event: string, listener: (...args: unknown[]) => void) => void; removeListener?: (event: string, listener: (...args: unknown[]) => void) => void };
 type Keeper = { state: string; lastPollAt: string | null; completedAutomatic: number; maxAutoFulfillments: number; wallet: string; lastError?: string | null };
 type TxLinks = Record<string, { request?: Hash; fulfill?: Hash }>;
+const storageKey = `chikyu-paid-randomness-${config.consumer}`;
 export const short = (value: string, n = 6) => `${value.slice(0, n)}…${value.slice(-4)}`;
 function errorText(error: unknown) {
   const e = error as { shortMessage?: string; message?: string; code?: number };
@@ -25,7 +26,8 @@ export function useLab() {
   const walletChain = sdk.chainId ? Number(sdk.chainId) : null;
   const provider = () => connectors?.evm?.provider as Provider | undefined;
   const [balance, setBalance] = useState<string | null>(null);
-  const [mode, setMode] = useState<'auto' | 'manual'>('auto');
+  const [fee, setFee] = useState<{ estimated: bigint; maximum: bigint; gasPrice: bigint } | null>(null);
+  const [feeError, setFeeError] = useState<string | null>(null);
   const [rolls, setRolls] = useState<Roll[]>([]);
   const [selectedId, setSelectedId] = useState<bigint | null>(null);
   const [extraRoll, setExtraRoll] = useState<Roll | null>(null);
@@ -49,8 +51,21 @@ export function useLab() {
   const confirmations = active && head >= active.requestBlock ? Number(head - active.requestBlock + 1n) : 0;
   const ready = !!active && blockTime >= target && confirmations >= config.minConfirmations;
   const keeperFresh = !!keeper?.lastPollAt && now - Math.floor(Date.parse(keeper.lastPollAt) / 1000) < 45;
-  const keeperOnline = keeperFresh && ['watching', 'submitting', 'transaction-pending'].includes(keeper!.state);
+  const keeperOnline = keeperFresh && ['watching', 'submitting', 'transaction-pending', 'collecting-fees'].includes(keeper!.state);
   const keeperLabel = keeperOnline ? 'Keeper active' : keeper?.state === 'low-balance' ? 'Keeper out of funds' : keeper?.state === 'budget-limit' ? 'Keeper limit reached' : 'Keeper unavailable';
+
+  const loadFee = useCallback(async () => {
+    const gasPrice = await client.getGasPrice();
+    const result = await client.call({ to: demo.address, data: encodeFunctionData({ abi: demo.abi, functionName: 'quote' }), gasPrice });
+    if (!result.data) throw new Error('Could not retrieve the service fee.');
+    const estimated = decodeFunctionResult({ abi: demo.abi, functionName: 'quote', data: result.data });
+    if (estimated === 0n) throw new Error('Paid randomness is not active yet.');
+    const maximum = (estimated * 125n + 99n) / 100n;
+    if (maximum > parseEther('0.5')) throw new Error('The service fee exceeds this demo’s 0.5 DOGE payment limit. Try again later.');
+    const next = { estimated, maximum, gasPrice };
+    setFee(next); setFeeError(null); return next;
+  }, []);
+  useEffect(() => { void loadFee().catch(e => { setFee(null); setFeeError(errorText(e)); }); }, [head, loadFee]);
 
   const refresh = useCallback(async (preferredId?: bigint) => {
     if (refreshLock.current) return;
@@ -72,8 +87,8 @@ export function useLab() {
   useEffect(() => {
     let cancelled = false;
     try {
-      setLinks(JSON.parse(localStorage.getItem('chikyu-transactions-v1') || '{}'));
-      const saved = localStorage.getItem('chikyu-selected-v1');
+      setLinks(JSON.parse(localStorage.getItem(`${storageKey}-transactions`) || '{}'));
+      const saved = localStorage.getItem(`${storageKey}-selected`);
       if (saved && /^\d+$/.test(saved)) { selectedRef.current = BigInt(saved); setSelectedId(BigInt(saved)); }
     } catch { /* Browsing also works without local storage. */ }
     const tick = () => { setNow(Math.floor(Date.now() / 1000)); void refresh(); };
@@ -100,12 +115,12 @@ export function useLab() {
 
   function select(id: bigint) {
     selectedRef.current = id; setSelectedId(id); setProof(null); setError(null); setNotice(null);
-    try { localStorage.setItem('chikyu-selected-v1', id.toString()); } catch { /* optional persistence */ }
+    try { localStorage.setItem(`${storageKey}-selected`, id.toString()); } catch { /* optional persistence */ }
   }
   function saveLink(id: bigint, kind: 'request' | 'fulfill', hash: Hash) {
     setLinks(previous => {
       const next = { ...previous, [id.toString()]: { ...previous[id.toString()], [kind]: hash } };
-      try { localStorage.setItem('chikyu-transactions-v1', JSON.stringify(next)); } catch { /* optional persistence */ }
+      try { localStorage.setItem(`${storageKey}-transactions`, JSON.stringify(next)); } catch { /* optional persistence */ }
       return next;
     });
   }
@@ -131,13 +146,10 @@ export function useLab() {
   async function requestRoll() {
     setError(null); setNotice(null); setProof(null); setBusy('Preparing request…');
     try {
-      const w = await wallet(); const gasPrice = await client.getGasPrice();
-      const quote = await client.call({ to: demo.address, data: encodeFunctionData({ abi: demo.abi, functionName: 'quote' }), gasPrice });
-      if (!quote.data) throw new Error('Could not retrieve the fee quote.');
-      const value = decodeFunctionResult({ abi: demo.abi, functionName: 'quote', data: quote.data });
-      const { request } = await client.simulateContract({ ...demo, functionName: 'requestRoll', args: [mode === 'auto'], account: w.account, value, gasPrice });
+      const w = await wallet(); const pricing = await loadFee();
+      const { request } = await client.simulateContract({ ...demo, functionName: 'requestRoll', args: [true], account: w.account, value: pricing.maximum, gasPrice: pricing.gasPrice });
       setBusy('Confirm the request in your wallet…');
-      const hash = await writeContract({ address: request.address, abi: request.abi, functionName: request.functionName, args: request.args, value: request.value });
+      const hash = await writeContract({ address: request.address, abi: request.abi, functionName: request.functionName, args: request.args, value: request.value, gasPrice: pricing.gasPrice });
       if (!hash) throw new Error('The wallet did not submit the transaction.'); setBusy('Waiting for the transaction…');
       const receipt = await client.waitForTransactionReceipt({ hash, timeout: 180000 });
       if (receipt.status !== 'success') throw new Error('The transaction reverted. Check the explorer.');
@@ -181,7 +193,7 @@ export function useLab() {
       setProof({ id: chosen.id, hex }); setNotice('Valid BLS signature. The random value and die roll match the onchain result.');
     } catch (e) { setError(errorText(e)); } finally { setBusy(null); }
   }
-  return { account, walletChain, balance, mode, setMode, rolls, selectedId, active, remaining, confirmations, ready,
+  return { account, walletChain, balance, fee, feeError, rolls, selectedId, active, remaining, confirmations, ready,
     count, keeper, keeperOnline, keeperLabel, busy, error, setError, rpcError, notice, proof, links, loading,
     refresh, select, connect, requestRoll, fulfill, verify };
 }

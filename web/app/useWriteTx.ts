@@ -29,6 +29,7 @@ export type WriteArgs = {
   functionName: string;
   args?: readonly unknown[];
   value?: bigint;
+  gasPrice?: bigint;
 };
 
 export type WriteState = {
@@ -123,12 +124,13 @@ export function useWriteTx(): WriteState {
             to: write.address,
             data: calldata,
             value: write.value,
+            ...(write.gasPrice !== undefined ? { maxFeePerGas: write.gasPrice, maxPriorityFeePerGas: write.gasPrice } : {}),
           }).catch(() => 500_000n),
         ]);
 
         const baseFee = block.baseFeePerGas ?? 1_000_000_000n;
-        const maxPriorityFeePerGas = 100n; // testnet has near-zero tips
-        const maxFeePerGas = baseFee * 2n + maxPriorityFeePerGas;
+        const maxPriorityFeePerGas = write.gasPrice ?? 100n;
+        const maxFeePerGas = write.gasPrice ?? baseFee * 2n + maxPriorityFeePerGas;
 
         const txParams: Record<string, unknown> = {
           from,

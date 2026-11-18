@@ -6,6 +6,7 @@
 **/node_modules/
 web/.next/
 web/out/
+**/.vercel/
 
 # Foundry build artifacts (regenerate with `forge build`)
 contracts/out/
