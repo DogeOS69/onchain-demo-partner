@@ -5,6 +5,10 @@ https://dogeos-demos.vercel.app. All four routes share one Vercel project and
 one DogeOS SDK client. The deployed frontend source is on
 `feat/aa-testnet-aws-vercel` (PR #8).
 
+`README.md` is the short index for all four demos. The full Questing integration
+and partner API walkthrough is in `docs/quest-integration.md`. Keep commercial
+proposals and internal decisions outside this public repository.
+
 - AA runs on AWS EKS, cluster `mydoge-wallet-staging-eks`, namespace
   `dogeos-aa-testnet`. It uses EntryPoint v0.9, salt 0 and account-paid DOGE;
   this testnet demo has no gas sponsorship or EIP-7702.
