@@ -1,34 +1,52 @@
 {
-  "checkedAt": "2026-11-18T05:08:24.399479+00:00",
-  "status": "Paid model validated; upgradeable contracts deployed; final runtime rollout and validation pending",
-  "coordinator": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
-  "consumer": {
-    "address": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91",
-    "transactionHash": "0x1b94d16134938b901c21045354d0a1956b5fd065fc5d67966e0b08df444afdb8",
-    "blockNumber": "9574351",
-    "gasUsed": "805157",
-    "estimatedCostDoge": "0.440956115058633851",
-    "proxyType": "transparent",
-    "implementation": "0x97480b78658acCf3228DE2481EA201022F3f54B3",
-    "admin": "0x63f0B09afc5CF5e5BA5638896046bfC645CB2f4C",
-    "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
+  "checkedAt": "2026-11-18T05:15:42.414862+00:00",
+  "status": "complete",
+  "scope": "Scroll-style prepaid AnyRand fulfillment with four upgradeable Randomness components on DogeOS Chikyu testnet",
+  "chainId": 6281971,
+  "runtimeCommit": "a7884b6ba5f5b062f371c3144544b9988547c882",
+  "frontend": {
+    "id": "dpl_2eTWBXeFq91btF9m4hNFArGduvCU",
+    "readyState": "READY",
+    "url": "dogeos-demos-ht9sd9twu-my-doge.vercel.app",
+    "sourceCommit": "a7884b6ba5f5b062f371c3144544b9988547c882",
+    "canonicalUrl": "https://dogeos-demos.vercel.app"
   },
-  "activation": {
+  "keeper": {
+    "provider": "AWS EKS",
+    "cluster": "mydoge-wallet-staging-eks",
+    "region": "us-east-2",
+    "namespace": "dogeos-randomness-testnet",
+    "deployment": "keeper",
+    "replicas": 1,
+    "statusUrl": "https://dogeos-demos.vercel.app/api/randomness/status",
+    "sourceCommit": "a7884b6ba5f5b062f371c3144544b9988547c882"
+  },
+  "source": {
+    "repository": "https://github.com/frogworksio/anyrand",
+    "commit": "4b17b49c4cad61b9cf5236e8d4a872dd1e84da30",
+    "copied": [
+      "contracts",
+      "audits",
+      "README.md"
+    ],
+    "modifications": "None. Demo consumer and operational tooling live outside vendor/."
+  },
+  "upstreamSolidityChanged": false,
+  "coordinatorImplementationChanged": false,
+  "scrollModel": {
+    "requestPremiumMultiplierBps": 15000,
+    "fee": "Estimated fulfillment execution and data cost multiplied by 1.5, prepaid in native DOGE",
+    "paymentHeadroomBps": 2500,
+    "excessPayment": "Refunded immediately in the request transaction",
+    "actualCallbackGasReconciliation": false,
+    "requestGas": "Paid separately by requester",
+    "completedFeeCollectionThresholdDoge": "0.1",
+    "pendingRequestFeesReserved": true
+  },
+  "paidActivation": {
     "transactionHash": "0xf56bf884f05b18925e72a703fb858053d5b650daa36796901981438d63413e27",
     "blockNumber": "9574016"
   },
-  "requestPremiumMultiplierBps": 15000,
-  "coreContractsChanged": false,
-  "tests": {
-    "randomnessIntegration": 12,
-    "typecheck": "passed",
-    "productionBuild": "passed"
-  },
-  "pending": [
-    "EKS and Vercel rollout for the proxy consumer",
-    "paid fulfillment through the new proxies",
-    "restart and browser validation"
-  ],
   "upgradeability": {
     "migratedAt": "2026-11-18T05:07:59.425Z",
     "owner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
@@ -46,7 +64,7 @@
       }
     }
   },
-  "proxies": {
+  "contracts": {
     "Coordinator": {
       "address": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
       "transactionHash": "0x7bc206ce6881d1bf08948e2b6e528a111e4a2924900c306c9b244317b2499a27",
@@ -90,5 +108,312 @@
       "admin": "0xeA3408C0fa4bD6AE271907d5f9eC4855CC518AC1",
       "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
     }
-  }
+  },
+  "retiredConsumers": [
+    {
+      "address": "0x07e3afc00f61da98d5e00cfca2b0fa25ece1b18b",
+      "transactionHash": "0x8e241496480cfb36947a92169a9d62517ac622662d2fd6163d0732bcb6696422",
+      "blockNumber": "9400131",
+      "estimatedCostDoge": "0.367589275676409705",
+      "gasUsed": "821750",
+      "reason": "Replaced by the paid consumer with bounded payment and immediate excess refund"
+    },
+    {
+      "address": "0xe31d349bf4a412d27b68a74767ecd635b8be0686",
+      "transactionHash": "0xd5d6a395634d249e3876f1575551d46a0364bbaacf1ae24baab35ef96e3d48c8",
+      "blockNumber": "9574014",
+      "gasUsed": "914896",
+      "estimatedCostDoge": "0.526847195248682368",
+      "reason": "Direct consumer replaced by an initialized upgradeable proxy; historical requests remain at this address"
+    }
+  ],
+  "upgradeValidation": {
+    "localUpgradeTests": "All four components reject unauthorized upgrades; authorized replacements execute new code. Pending and completed consumer requests, fees, coordinator commitments and funds survive upgrades. Real drand proofs remain valid.",
+    "liveProxyReadback": {
+      "checkedAt": "2026-11-18T05:09:11.416Z",
+      "proxies": {
+        "Coordinator": {
+          "address": "0xd96ae24e41474401294f2de1b1e8270941e8d193",
+          "proxyType": "uups",
+          "implementation": "0x6dEc91b6Ba93B3904d5995D238b0055349A3b0D9",
+          "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
+        },
+        "RandomnessDemo": {
+          "address": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91",
+          "proxyType": "transparent",
+          "implementation": "0x97480b78658acCf3228DE2481EA201022F3f54B3",
+          "admin": "0x63f0B09afc5CF5e5BA5638896046bfC645CB2f4C",
+          "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
+        },
+        "DrandBeacon": {
+          "address": "0x0a82176864a96d1a82586498e1e388a2cac839b4",
+          "proxyType": "transparent",
+          "implementation": "0x2d0E53523950d651B94ce20591E110f7f0AA01F6",
+          "admin": "0x22F730D52419a40Ac53419eB5e7f505fd168554d",
+          "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
+        },
+        "GasStationScroll": {
+          "address": "0x371b87c79a1bf1c2c483364d32e6988417c7a38d",
+          "proxyType": "transparent",
+          "implementation": "0xFCcD4Bc9e371aeF255ED96554e6108eC6098894b",
+          "admin": "0xeA3408C0fa4bD6AE271907d5f9eC4855CC518AC1",
+          "upgradeOwner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C"
+        }
+      },
+      "initializerLocked": true,
+      "originalDrandProofVerified": true,
+      "coordinatorWiringVerified": true
+    },
+    "liveImplementationUpgradePerformed": false,
+    "note": "The existing coordinator implementation was retained. The other components were migrated from direct deployments to new proxies; old consumer history remains at its original address."
+  },
+  "paidRequests": [
+    {
+      "requestId": "10",
+      "consumer": "0xe31d349bf4a412d27b68a74767ecd635b8be0686",
+      "round": "22485534",
+      "face": 2,
+      "word": "107877223186554686029172332340826138646506333724738605520925337836932447722157",
+      "feePaidWei": "53438110440707788",
+      "refundedWei": "13359527610176947",
+      "request": {
+        "transactionHash": "0xcbbf39e9f86bb16b517aa2bf96e17ac6d0d81ba123098e53e8eebc3bf59dd521",
+        "blockNumber": "9574063",
+        "gasUsed": "271411",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "16863063857844113",
+        "networkCostWei": "16867319611636501"
+      },
+      "fulfillment": {
+        "transactionHash": "0x1046ffbd5453db7aabc763d7a3a5e5c0a889ffea83d780e7f61cd0a095137f41",
+        "blockNumber": "9574095",
+        "gasUsed": "243962",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "33768555078928363",
+        "networkCostWei": "33772380429436259"
+      }
+    },
+    {
+      "requestId": "11",
+      "consumer": "0xe31d349bf4a412d27b68a74767ecd635b8be0686",
+      "round": "22485592",
+      "face": 4,
+      "word": "83778898017392127445231018844415428711727575429185866863267068086422238841827",
+      "feePaidWei": "53638310242021329",
+      "refundedWei": "13409577560505333",
+      "request": {
+        "transactionHash": "0x6a4d0f994a5ced94a7bc3bae59ce262e39cdc7b80e1dad596048583d7ab97e6d",
+        "blockNumber": "9574120",
+        "gasUsed": "254293",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "16926249141733668",
+        "networkCostWei": "16930236483437312"
+      },
+      "fulfillment": {
+        "transactionHash": "0x5f77d9b028eac81dfc64299afc33cc867b5b5daafd011d38cfff092ae8e5b23b",
+        "blockNumber": "9574153",
+        "gasUsed": "249118",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "34810535399346315",
+        "networkCostWei": "34814441596491059"
+      }
+    },
+    {
+      "requestId": "12",
+      "consumer": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91",
+      "round": "22485865",
+      "face": 6,
+      "word": "104811182657181325248941252382266929733062788739930449372982417259404337490995",
+      "feePaidWei": "57836587278300780",
+      "refundedWei": "14459146819575195",
+      "request": {
+        "transactionHash": "0xb754242489608a3194a13f67d15b2074cada346858c46231de7708c12c0fb568",
+        "blockNumber": "9574393",
+        "gasUsed": "296322",
+        "effectiveGasPrice": "15680109",
+        "l1FeeWei": "18390314390678139",
+        "networkCostWei": "18394960751937237"
+      },
+      "fulfillment": {
+        "transactionHash": "0x55205b4c585e5414222574166483469dd248a9cf49c3651928f0cf78d754d60b",
+        "blockNumber": "9574427",
+        "gasUsed": "260780",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "35488594627723624",
+        "networkCostWei": "35492683686287864"
+      }
+    },
+    {
+      "requestId": "13",
+      "consumer": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91",
+      "round": "22485878",
+      "face": 4,
+      "word": "110369157656725700287106032736319597337875015715776233056099470378206724552009",
+      "feePaidWei": "56542066304276973",
+      "refundedWei": "14135516576069244",
+      "request": {
+        "transactionHash": "0xad9485eff66a2c2f4b466cd0907d520988858b22abed7350ea3f9bedf67f9d55",
+        "blockNumber": "9574406",
+        "gasUsed": "279222",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "17842706850162124",
+        "networkCostWei": "17847085081278100"
+      },
+      "fulfillment": {
+        "transactionHash": "0x425af3852e3752f1ccbd48b0f011471f1f29994c955c6af43b5800fd0d2fb1a1",
+        "blockNumber": "9574439",
+        "gasUsed": "260896",
+        "effectiveGasPrice": "15680108",
+        "l1FeeWei": "35402959660989696",
+        "networkCostWei": "35407050538446464"
+      }
+    }
+  ],
+  "feeWithdrawals": [
+    {
+      "amountWei": "107076420682729117",
+      "transactionHash": "0x4c608a6367890dc6902a47841d067222621d0d970a59d5a31f09cebfb9417f15",
+      "blockNumber": "9574172",
+      "gasUsed": "36589",
+      "effectiveGasPrice": "15680108",
+      "l1FeeWei": "17907653930790736",
+      "networkCostWei": "17908227650262348"
+    },
+    {
+      "amountWei": "114378653582577753",
+      "transactionHash": "0x9eff3de1cee5c93463c2bf951a84bd78e7a3a6e537252e7b76bb4a8ea87adba8",
+      "blockNumber": "9574458",
+      "gasUsed": "36589",
+      "effectiveGasPrice": "15680107",
+      "l1FeeWei": "17499692789679416",
+      "networkCostWei": "17500266509114439"
+    }
+  ],
+  "observedEconomicsWei": {
+    "feesCollected": "221455074265306870",
+    "feesWithdrawn": "221455074265306870",
+    "fulfillmentNetworkCost": "139486556250661646",
+    "withdrawalNetworkCost": "35408494159376787",
+    "remainderAfterDeliveryAndCollection": "46560023855268437",
+    "note": "Four testnet observations only; excludes deployment/infra costs and requester transaction gas. Commercial revenue sharing has not been configured."
+  },
+  "restart": {
+    "nonceBefore": 27,
+    "nonceAfter": 27,
+    "duplicateTransactions": false,
+    "before": {
+      "startedAt": "2026-11-18T05:08:48.236Z",
+      "lastPollAt": "2026-11-18T05:13:50.136Z",
+      "lastSuccessAt": "2026-11-18T05:11:55.262Z",
+      "lastTransaction": "0x425af3852e3752f1ccbd48b0f011471f1f29994c955c6af43b5800fd0d2fb1a1",
+      "lastError": null,
+      "pending": 0,
+      "completedAutomatic": 4,
+      "failedCallbacks": 0,
+      "scanned": 4,
+      "state": "watching",
+      "wallet": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "minConfirmations": 18,
+      "maxAutoFulfillments": 0,
+      "minBalanceDoge": "2",
+      "maxCostDoge": "0.2",
+      "autoWithdraw": true,
+      "withdrawMinDoge": "0.1",
+      "delivery": "paid-coordinator-requests",
+      "balanceWei": "33138245956383921671",
+      "head": "9574477",
+      "confirmedHead": "9574460",
+      "requestPremiumMultiplierBps": 15000,
+      "feesCollectedWei": "221455074265306870",
+      "feesWithdrawnWei": "221455074265306870",
+      "pendingFeeReserveWei": "0",
+      "availableFeesWei": "0",
+      "coordinatorBalanceWei": "0",
+      "fulfillmentCostWei": "139486556250661646",
+      "withdrawalCostWei": "35408494159376787",
+      "owner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "withdrawalRequired": false,
+      "lastWithdrawal": "0x9eff3de1cee5c93463c2bf951a84bd78e7a3a6e537252e7b76bb4a8ea87adba8",
+      "chainId": 6281971,
+      "consumer": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91"
+    },
+    "after": {
+      "startedAt": "2026-11-18T05:14:09.201Z",
+      "lastPollAt": "2026-11-18T05:14:38.498Z",
+      "lastSuccessAt": null,
+      "lastTransaction": null,
+      "lastError": null,
+      "pending": 0,
+      "completedAutomatic": 4,
+      "failedCallbacks": 0,
+      "scanned": 4,
+      "state": "watching",
+      "wallet": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "minConfirmations": 18,
+      "maxAutoFulfillments": 0,
+      "minBalanceDoge": "2",
+      "maxCostDoge": "0.2",
+      "autoWithdraw": true,
+      "withdrawMinDoge": "0.1",
+      "delivery": "paid-coordinator-requests",
+      "balanceWei": "33138245956383921671",
+      "head": "9574493",
+      "confirmedHead": "9574476",
+      "requestPremiumMultiplierBps": 15000,
+      "feesCollectedWei": "221455074265306870",
+      "feesWithdrawnWei": "221455074265306870",
+      "pendingFeeReserveWei": "0",
+      "availableFeesWei": "0",
+      "coordinatorBalanceWei": "0",
+      "fulfillmentCostWei": "139486556250661646",
+      "withdrawalCostWei": "35408494159376787",
+      "owner": "0x4518A4baA6BE1a6977F589168cfF6Ce68101703C",
+      "withdrawalRequired": false,
+      "chainId": 6281971,
+      "consumer": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91"
+    }
+  },
+  "validation": {
+    "randomnessIntegrationTests": 12,
+    "typecheck": "passed",
+    "vercelProductionBuild": "passed",
+    "browser": {
+      "routes": [
+        {
+          "route": "/",
+          "status": 200
+        },
+        {
+          "route": "/external",
+          "status": 200
+        },
+        {
+          "route": "/onchain",
+          "status": 200
+        },
+        {
+          "route": "/aa",
+          "status": 200
+        },
+        {
+          "route": "/randomness",
+          "status": 200
+        }
+      ],
+      "consumer": "0x8ba855fa83779c2db508dc1f2de90b6e1895bc91",
+      "proofVerifiedInBrowser": true,
+      "javascriptErrors": [],
+      "railwayRequests": [],
+      "mobileOverflow": false,
+      "walletTransactionTest": "Paid transactions used a dedicated testnet wallet through RPC; human Google/X login and a social-wallet payment were not exercised."
+    }
+  },
+  "limitations": [
+    "Upgrade authority is the existing testnet owner EOA; mainnet multisig custody is not configured.",
+    "The keeper is a single testnet signing instance, with no production SLA.",
+    "Gas spikes or drand/RPC outages can delay fulfillment; callback failure is charged and terminal under upstream semantics.",
+    "Storage compatibility and drand key/timing compatibility remain requirements for future upgrades.",
+    "Human Google/X sign-in and a social-wallet payment were not exercised in this validation."
+  ],
+  "pending": []
 }

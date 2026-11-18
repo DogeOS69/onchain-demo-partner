@@ -85,6 +85,30 @@ Historical migration receipts below describe the earlier free demo. See
 [randomness-scroll-validation.json](randomness-scroll-validation.json) for paid
 requests, fee collection and restart evidence.
 
+## Current paid and upgradeable validation
+
+Runtime commit `a7884b6ba5f5b062f371c3144544b9988547c882` is deployed on EKS
+and Vercel. The canonical consumer proxy is
+`0x8ba855fa83779c2db508dc1f2de90b6e1895bc91`; the coordinator remains
+`0xd96ae24e41474401294f2de1b1e8270941e8d193`.
+
+Paid requests #12 and #13 completed through the new proxies and returned die
+faces 6 and 4. Their delivery fees were approximately 0.057837 and 0.056542 DOGE;
+observed fulfillment costs were 0.035493 and 0.035407 DOGE, including data fees.
+Excess request payments were refunded. Together with the two earlier paid
+requests, 0.221455074265306870 DOGE was collected and withdrawn to the operator
+in two withdrawals. A subsequent pod replacement reconstructed all four paid
+fulfillments and both withdrawals with the signing account nonce unchanged at 27.
+
+All 12 Randomness integration tests, TypeScript checking and the Vercel build
+passed. Local tests execute upgrades of all four components, including pending
+and completed state preservation and rejection of unauthorized upgrades. Live
+checks verify the proxy slots, owners, initialization lock, coordinator wiring,
+paid callbacks and proof verification. The browser loaded all four demo routes,
+verified request #12's proof and rendered at 360px without horizontal overflow
+or JavaScript errors. Paid transactions used a dedicated wallet through RPC;
+human Google/X sign-in and a social-wallet payment were not exercised.
+
 ## Shared staging cluster
 
 This cluster also hosts staging wallet/gateway, user and security services,
