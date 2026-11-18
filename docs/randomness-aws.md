@@ -59,3 +59,17 @@ embedded wallet/social relay, push and WebSocket services, token platform,
 image management, AI Feed and Meilisearch, the job scheduler and Kubernetes
 system components. Questing staging runs separately in ECS, cluster
 `dogeos-quest-api-staging-cluster` in `us-east-1`.
+
+## Migration validation and retirement
+
+The former Railway `keeper` service in `anyrand-chikyu-demo` was stopped
+before the AWS keeper started and deleted on 2026-11-17 after validation.
+Its former `keeper-production-fd08a51c.up.railway.app` URL returns 404.
+The project has no remaining services or keeper volumes.
+
+A real automatic request (#8) completed through the AWS keeper and returned
+die face 4. Replacing the pod recovered five cumulative automatic
+fulfillments without sending a duplicate transaction. The published Vercel
+app shows the keeper available and the result, with no requests to Railway.
+Five Randomness integration tests, TypeScript checking, and the Vercel
+production build passed. See [validation receipts](randomness-aws-validation.json).

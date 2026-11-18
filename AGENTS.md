@@ -8,8 +8,10 @@ one DogeOS SDK client. The deployed frontend source is on
 - AA runs on AWS EKS, cluster `mydoge-wallet-staging-eks`, namespace
   `dogeos-aa-testnet`. It uses EntryPoint v0.9, salt 0 and account-paid DOGE;
   this testnet demo has no gas sponsorship or EIP-7702.
-- Randomness still depends on the Railway `keeper` service in project
-  `anyrand-chikyu-demo`. It is required by the current Vercel demo.
+- Randomness runs on the same AWS staging EKS cluster, namespace
+  `dogeos-randomness-testnet`, deployment `keeper`. Its HTTPS status is served
+  by Vercel at `/api/randomness/status`; the signing key stays in EKS.
+  See `docs/randomness-aws.md` for deployment and recovery instructions.
 - Questing and SDK authentication use their existing shared services.
 - External Rule still needs its partner API configuration and quest ID.
 
@@ -22,6 +24,10 @@ receipt URLs or earlier deployment notes as current hosting instructions.
 The `feat/partner-aa-7702` branch and its Railway services are a separate
 devnet experiment. The older `chikyu-aa-lab` is also outside these four demos;
 neither is the backend for the canonical Vercel AA demo.
+
+The former Randomness `keeper` service in Railway project `anyrand-chikyu-demo`
+was also deleted on 2026-11-17 after a successful AWS fulfillment and restart
+check. `keeper-production-fd08a51c.up.railway.app` is retired.
 
 Use `docs/aa-aws-vercel.md` for current hosting and `docs/account-abstraction.md`
 for the AA flow. Validation JSON files retain historical URLs and receipts.

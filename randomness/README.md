@@ -1,6 +1,6 @@
 # Randomness backend
 
-The `/randomness` route in `../web` uses the shared DogeOS SDK connection. This directory contains the already deployed Anyrand contracts, the bounded keeper, and their tests. The deployment in `deployments/chikyu.json` is the same one used by the original randomness demo; copying the source here does not redeploy it or start a second keeper.
+The `/randomness` route in `../web` uses the shared DogeOS SDK connection. This directory contains the already deployed Anyrand contracts, the bounded keeper, and their tests. The deployment in `deployments/chikyu.json` is the same one used by the original randomness demo; the keeper now runs on AWS EKS and the web reads its status through `/api/randomness/status`.
 
 ```bash
 npm ci
@@ -9,7 +9,7 @@ npm test
 npm run status
 ```
 
-For a separate deployment, configure `.env.example`, use a dedicated funded Chikyū key, run `npm run deploy`, and update the frontend with `npm run sync:web`. Run a single keeper for that deployment with `npm run keeper`; use the included Dockerfile and Railway config for a continuously running instance. Never run two keepers with the same signing key.
+For a separate deployment, configure `.env.example`, use a dedicated funded Chikyū key, run `npm run deploy`, and update the frontend with `npm run sync:web`. Run a single keeper for that deployment with `npm run keeper`; use the [AWS deployment](../docs/randomness-aws.md) for the current continuously running instance. The Dockerfile and Railway config are portable deployment examples, not the current hosting. Never run two keepers with the same signing key.
 
 The player pays the request transaction gas. Automatic mode lets the keeper submit the future drand round's BLS proof; manual mode asks the SDK wallet to submit it. Both modes use the same onchain verifier and consumer callback. The UI verifies the proof and recomputes the result. The keeper waits for 18 confirmations, checks fees including the DogeOS data fee, and stops at its configured funding and operation limits.
 

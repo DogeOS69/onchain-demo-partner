@@ -78,7 +78,8 @@ current AA state had no submitted or included operations. The old public and
 private endpoints are retired. Use `https://dogeos-demos.vercel.app` as the
 canonical frontend and the AWS backend described above.
 
-Randomness still uses the separate Railway keeper in `anyrand-chikyu-demo`.
-The separate devnet 7702 experiment and older `chikyu-aa-lab` are outside these
-four demos and were not removed. Historical validation files retain the URLs
-and deployment IDs that were used for those checks.
+Randomness now uses its own keeper deployment in the same EKS staging
+cluster, namespace `dogeos-randomness-testnet`; see
+[randomness hosting](randomness-aws.md). The separate devnet 7702 experiment
+and older `chikyu-aa-lab` remain on Railway outside these four demos.
+Historical validation files retain their original URLs and deployment IDs.
