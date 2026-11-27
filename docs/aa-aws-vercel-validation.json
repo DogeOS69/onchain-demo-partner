@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-11-17T07:41:56.986122+00:00",
+  "webUrl": "https://dogeos-aa-testnet.vercel.app/aa",
+  "sourceCommit": "92084a589d5e0b81b058d30421f99da01a17d1f6",
+  "entryPointVersion": "0.9",
+  "accountSalt": "0",
+  "eip7702": false,
+  "gasSponsorship": false,
+  "network": "DogeOS Chikyu testnet",
+  "aws": {
+    "cluster": "mydoge-wallet-staging-eks",
+    "namespace": "dogeos-aa-testnet",
+    "replicas": 1,
+    "persistentStorage": "1Gi gp3",
+    "httpsApi": "https://d26nw63j4pdrl3.cloudfront.net",
+    "cloudFrontDistributionId": "E9NMFA596VB5H",
+    "originTransport": "HTTP from the CloudFront origin prefix list only",
+    "executor": "0xDfCc9d150dA4cd959628F6019A58dbC3bFA5be37",
+    "runtimeStatus": "Ready"
+  },
+  "vercel": {
+    "team": "my-doge",
+    "project": "dogeos-aa-testnet",
+    "deploymentId": "dpl_ACEjZ2UUYV9cTZz9AABQW9xmKBL1",
+    "status": "READY"
+  },
+  "checks": {
+    "backendTests": 10,
+    "webBuild": "passed",
+    "apiUnauthorizedStatus": 401,
+    "apiAuthorizedStatus": 200,
+    "vercelProxyStatus": 200,
+    "publicPageStatus": 200,
+    "restart": "Passed: replaced the pod and recovered the confirmed operation through the public Vercel API.",
+    "persistedOperationIds": [
+      "5956cf2d-4c9c-4028-860c-6f5b5eacde6b"
+    ]
+  },
+  "browserProof": {
+    "base": "http://127.0.0.1:5194",
+    "owner": "0x32d2E08014e96e239b516505462Ec2317CB2738d",
+    "account": "0x795a6b13D196AF1C384F87e748BBbCBc4FFF6f15",
+    "salt": 0,
+    "count": "1",
+    "transactionUrl": "https://dogeos-testnet.l2scan.co/tx/0x51fab149af634caef75a108b29cf7a5db709d9e70f54617c9346561756c11496",
+    "errors": [],
+    "userChargeWei": "83712130877875032",
+    "networkFeeWei": "67031062126165993",
+    "l1FeeWei": "67026591382697939",
+    "fundedWei": "90000000000000000",
+    "accountBeforeWei": "0",
+    "entryPointVersion": "0.9",
+    "typedDataSignCount": 2,
+    "ownerTransactionRequests": [
+      "eth_sendTransaction",
+      "eth_sendTransaction"
+    ],
+    "reloadRecovered": true,
+    "reconnectedAfterReload": false,
+    "sharedSdkConnection": true,
+    "fundingCancellationRecovered": true,
+    "signatureCancellationRecovered": true
+  },
+  "qualification": "Real SDK external-wallet flow on a local build of the same UI, using the published Vercel API which forwards to AWS. Human Google/X login was not completed.",
+  "remaining": [
+    "Register https://dogeos-aa-testnet.vercel.app as an allowed origin on the existing DogeOS SDK client; the previous Railway origin works and the new origin fails CORS."
+  ]
+}

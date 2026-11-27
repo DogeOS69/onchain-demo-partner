@@ -1,0 +1,60 @@
+{
+  "chainId": 6281971,
+  "genesisHash": "0xf9f7c524dce38b51a4d28ec2f18680773e5ba9d3f5f430d0e05f92cfeb65b1bc",
+  "rpcUrl": "https://rpc.testnet.dogeos.com",
+  "explorerUrl": "https://dogeos-testnet.l2scan.co",
+  "entryPointVersion": "0.9",
+  "entryPoint": "0x433709009B8330FDa32311DF1C2AFA402eD8D009",
+  "accountFactory": "0xc991D3F45eE3dBb2cB270E48195384154C9d40bb",
+  "accountImplementation": "0xE1D56b7F2eC2DA5fDc0A7C2958C9b2Ff1d0b4b2D",
+  "counter": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+  "entryPointSimulations": "0xA81301127785225E5A190B3D0adE652a9BE53D26",
+  "pimlicoSimulations": "0x526da1072f23fd17b56906ea77bc712086229e69",
+  "contracts": {
+    "EntryPoint": {
+      "address": "0x433709009B8330FDa32311DF1C2AFA402eD8D009",
+      "bytecodeHash": "0x02025307db5c9d7eeccd47fb6367c13def38d851a60dc851df2089ab61d45068",
+      "creationDataHash": "0x91969ed275ff203367aaf9a01e4c83453271cc52e600d8cf147302e7cb1755d4",
+      "runtimeCodeHash": "0x723352984e0761e22ca9ae376a4c0fc95dc291c10a38bafd66201daf084f378d",
+      "transactionHash": "0xcca5b5f5f93c1c83abb151f6f225dea56564fbef3f735f07e733142cec65d3a7",
+      "blockNumber": "9517081"
+    },
+    "SimpleAccountFactory": {
+      "address": "0xc991D3F45eE3dBb2cB270E48195384154C9d40bb",
+      "bytecodeHash": "0x3e2a91434728820a38808da8a9236a6961055923323f08b215e0fcab749fb755",
+      "creationDataHash": "0x47a4a4bd4144e9b58ff5cbbacfb3b75a3267bafe4960a5035cb4e60d6e741e7b",
+      "runtimeCodeHash": "0x175e78ed9f72d4ab2d523719fab94cca413277058351cef6f08554ff7aeb9790",
+      "transactionHash": "0x14ebd1f2829489b1109b377bcc1e729dd80fedddb51bec8a2f148ca2d29caf68",
+      "blockNumber": "9517101"
+    },
+    "EntryPointSimulations09": {
+      "address": "0xA81301127785225E5A190B3D0adE652a9BE53D26",
+      "bytecodeHash": "0x3822120e98fcc2d8ce3d8679d75df35f7cdfd258c804058b122586b0ae8495af",
+      "creationDataHash": "0x3822120e98fcc2d8ce3d8679d75df35f7cdfd258c804058b122586b0ae8495af",
+      "runtimeCodeHash": "0xaf42a4229d8fe7fcf2a661e3130ac64f6052da0a742b0d87ec98b59bbb841994",
+      "transactionHash": "0xde71fc0a3fb8ed68cea2974ae3fc0e51c1efe7faa5a367977f0842018cd7958c",
+      "blockNumber": "9517120"
+    },
+    "SimpleAccount": {
+      "address": "0xE1D56b7F2eC2DA5fDc0A7C2958C9b2Ff1d0b4b2D",
+      "runtimeCodeHash": "0xbdbc6bbfb5dc813c1941d884f8533f849068f1576cd87b9c5bad3989be5e5722"
+    },
+    "Counter": {
+      "address": "0x935b84fc676958daf32ce333302f3b396bb4b7cb",
+      "runtimeCodeHash": "0x272e78b3a78a47832b2e52f4d63e931a762e58cb43cb5be39e25004e9e10d450"
+    },
+    "PimlicoSimulations": {
+      "address": "0x526da1072f23fd17b56906ea77bc712086229e69",
+      "bytecodeHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
+      "creationDataHash": "0x30ce3bb225bd692e281ac353d86d259a666b3939d9e10d98014829e17e53e3ae",
+      "runtimeCodeHash": "0x22dbcbfa136fcf31bd56a73a11492356bbfac658009dc867cfb0a61485bd7b37",
+      "transactionHash": "0x0997d29a4434bd4112b8d29bdb618ef3928e0ac0fafa7e672a333cb4d2a51e11"
+    }
+  },
+  "accountSalt": "0",
+  "executor": "0x0FDd7B8DDE2A4634B3328AE0Db2f375688A101aF",
+  "deployer": "0x1d628643Bf4194baCCdbaD034daf00E139f288f5",
+  "deploymentBlock": "9517120",
+  "preinstallsVersion": "v0.2.2",
+  "upstreamCommit": "b36a1ed52ae00da6f8a4c8d50181e2877e4fa410"
+}

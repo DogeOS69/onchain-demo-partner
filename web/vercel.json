@@ -1,0 +1,5 @@
+{
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "functions": { "app/api/aa/[...path]/route.ts": { "maxDuration": 60 } }
+}
